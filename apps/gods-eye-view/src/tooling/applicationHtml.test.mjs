@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { expandApplicationHtml, APPLICATION_TEMPLATES } from '../../build/application-html.js';
+import { expandApplicationHtml, APPLICATION_TEMPLATES } from '../../build-tools/application-html.js';
 
 test('the standalone document expands every component once and preserves unique element ids', () => {
   const source = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');

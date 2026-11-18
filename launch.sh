@@ -3,6 +3,14 @@
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
+# Prefer conda python3 (has all deps); fall back to .venv then system python3.
+if [[ -x "${CONDA_PREFIX:-/home/hermes/miniconda3}/bin/python3" ]]; then
+    python_bin="${JARVIS_PYTHON:-${CONDA_PREFIX:-/home/hermes/miniconda3}/bin/python3}"
+elif [[ -x "$PWD/.venv/bin/python" ]]; then
+    python_bin="${JARVIS_PYTHON:-$PWD/.venv/bin/python}"
+else
+    python_bin="${JARVIS_PYTHON:-python3}"
+fi
 # --- Conda/xcb library path for Qt platform plugins ---
 # PyQt6's xcb plugin needs libxcb-cursor, libxcb-icccm, etc. from conda.
 if [[ -d "${CONDA_PREFIX:-/home/hermes/miniconda3}/lib" ]]; then
@@ -11,7 +19,7 @@ fi
 # Ask PyQt's runtime distribution where its plugins actually live. The
 # bindings and PyQt6-Qt6 runtime can be installed in different site-packages
 # directories, so importing PyQt6 alone does not reliably reveal the path.
-_plugin_root="$(python3 - <<'PY' 2>/dev/null || true
+_plugin_root="$("$python_bin" - <<'PY' 2>/dev/null || true
 from pathlib import Path
 try:
     import importlib.metadata
@@ -27,7 +35,7 @@ except Exception:
 PY
 )"
 if [[ -z "$_plugin_root" ]]; then
-    _pyqt6_dir="$(python3 -c 'import PyQt6; print(PyQt6.__path__[-1])' 2>/dev/null || true)"
+    _pyqt6_dir="$("$python_bin" -c 'import PyQt6; print(PyQt6.__path__[-1])' 2>/dev/null || true)"
     _plugin_root="${_pyqt6_dir:+${_pyqt6_dir}/Qt6/plugins}"
 fi
 [[ -z "$_plugin_root" ]] || export QT_PLUGIN_PATH="${_plugin_root}:${QT_PLUGIN_PATH:-}"
@@ -55,41 +63,51 @@ if [[ -n "$cudnn_dir" ]]; then
     export LD_LIBRARY_PATH="$cudnn_dir:${LD_LIBRARY_PATH:-}"
 fi
 
-# --- Start God's Eye View server if not already running ---
-if [[ "${KD_START_GEV_DEV:-0}" == "1" ]] && ! curl --noproxy '*' -sS --max-time 2 -o /dev/null -w '%{http_code}' http://127.0.0.1:4174/ 2>/dev/null | grep -q '200'; then
-    echo "[JARVIS] Starting God's Eye View server..."
-    # Change to the God's Eye View app directory and start the Vite server
-    cd "$(dirname -- "${BASH_SOURCE[0]}")/apps/gods-eye-view"
-    # Use .jarvis-runtime node if available, otherwise system node
-    if [[ -x ".jarvis-runtime/node_modules/node/bin/node" ]]; then
-        export PATH="$PWD/.jarvis-runtime/node_modules/node/bin:$PATH"
-    fi
-    # Start vite in background, redirect output
-    node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4174 --strictPort > /tmp/gev-server.log 2>&1 &
-    GEV_PID=$!
-    echo "GEV_PID=$GEV_PID" >> /tmp/jarvis-environment.txt
-    # Wait for server to be ready
-    for i in $(seq 1 30); do
-        if curl --noproxy '*' -sS --max-time 2 -o /dev/null -w '%{http_code}' http://127.0.0.1:4174/ 2>/dev/null | grep -q '200'; then
-            echo "[JARVIS] God's Eye View server ready on port 4174"
-            break
+# Track children we start. Never stop a globe server owned by another launcher.
+auth_copy=""
+child=""
+gev_pid=""
+cleanup() {
+    local pid
+    for pid in "$child" "$gev_pid"; do
+        if [[ -n "$pid" ]]; then
+            kill -TERM "$pid" 2>/dev/null || true
+            wait "$pid" 2>/dev/null || true
         fi
-        sleep 0.5
     done
-    # Return to Mark-LVI-main
-    cd -
-fi
+    [[ -z "$auth_copy" ]] || rm -f -- "$auth_copy"
+}
+trap cleanup EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
 
-# --- Rest of original launch.sh ---
+start_gev() {
+    [[ "${KD_START_GEV_DEV:-0}" == "1" ]] || return 0
+    if curl --noproxy '*' --fail --silent --max-time 2 -o /dev/null http://127.0.0.1:4174/; then
+        return 0
+    fi
+    local logfile
+    if ! logfile=$(mktemp "${TMPDIR:-/tmp}/kd-gev.XXXXXXXX"); then
+        echo '[JARVIS] Could not create the optional globe log.' >&2
+        return 0
+    fi
+    # No readiness polling on the desktop startup path. Only this run owns
+    # the new server, and it must not retain the ./kd launch lock (fd 9).
+    bash apps/gods-eye-view/launch-jarvis.sh >"$logfile" 2>&1 9>&- &
+    gev_pid=$!
+    echo "[JARVIS] Starting God's Eye View on port 4174 (log: $logfile)"
+}
 
-# Prefer conda python3 (has all deps); fall back to .venv then system python3.
-if [[ -x "${CONDA_PREFIX:-/home/hermes/miniconda3}/bin/python3" ]]; then
-    python_bin="${JARVIS_PYTHON:-${CONDA_PREFIX:-/home/hermes/miniconda3}/bin/python3}"
-elif [[ -x "$PWD/.venv/bin/python" ]]; then
-    python_bin="${JARVIS_PYTHON:-$PWD/.venv/bin/python}"
-else
-    python_bin="${JARVIS_PYTHON:-python3}"
-fi
+run_app() {
+    start_gev
+    local status=0
+    "$@" &
+    child=$!
+    wait "$child" || status=$?
+    child=""
+    return "$status"
+}
+
 if [[ "${1:-}" == "--virtual-display" ]]; then
     shift
     command -v xvfb-run >/dev/null || {
@@ -97,8 +115,9 @@ if [[ "${1:-}" == "--virtual-display" ]]; then
         exit 1
     }
     echo "[JARVIS] Starting an isolated virtual display (not your visible desktop)."
-    exec xvfb-run -a -s '-screen 0 1920x1080x24 -nolisten tcp' \
+    run_app xvfb-run -a -s '-screen 0 1920x1080x24 -nolisten tcp' \
         env QT_QPA_PLATFORM=xcb "$python_bin" -u main.py "$@"
+    exit
 fi
 
 runtime="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
@@ -137,18 +156,6 @@ export QT_QPA_PLATFORM=xcb
 
 # python-xlib does not match Mutter's empty display-number auth entries.
 # Make a private, display-specific copy; never modify the session's authority.
-auth_copy=""
-child=""
-cleanup() {
-    if [[ -n "$child" ]]; then
-        kill -TERM "$child" 2>/dev/null || true
-        wait "$child" 2>/dev/null || true
-    fi
-    [[ -z "$auth_copy" ]] || rm -f -- "$auth_copy"
-}
-trap cleanup EXIT
-trap 'exit 143' TERM
-trap 'exit 130' INT
 if [[ -n "${XAUTHORITY:-}" && -r "$XAUTHORITY" ]]; then
     auth_copy=$(mktemp "${XDG_RUNTIME_DIR:-/tmp}/jarvis-xauth.XXXXXXXX")
     "$python_bin" - "$auth_copy" <<'PY'
@@ -167,7 +174,4 @@ with open(sys.argv[1], "wb") as target:
 PY
     export XAUTHORITY="$auth_copy"
 fi
-"$python_bin" -u main.py "$@" &
-child=$!
-wait "$child"
-child=""
+run_app "$python_bin" -u main.py "$@"

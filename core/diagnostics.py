@@ -7,13 +7,17 @@ from __future__ import annotations
 
 import importlib.metadata
 import json
+import os
 import platform
 import shutil
 import subprocess
 from datetime import datetime, timezone
 from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 
-import psutil
+try:
+    import psutil
+except ImportError:  # `kd doctor` must also run before setup.
+    psutil = None
 
 
 class _NoRedirect(HTTPRedirectHandler):
@@ -65,7 +69,7 @@ def gpu_inventory() -> dict:
 
 def collect() -> dict:
     packages = {}
-    for name in ("fastapi", "PyQt6", "faster-whisper", "piper-tts",
+    for name in ("fastapi", "PyQt6", "psutil", "faster-whisper", "piper-tts",
                  "sounddevice", "onnxruntime", "onnxruntime-gpu", "torch"):
         try:
             packages[name] = importlib.metadata.version(name)
@@ -74,8 +78,9 @@ def collect() -> dict:
     return {
         "schema_version": "1.0", "observed_at": datetime.now(timezone.utc).isoformat(),
         "system": {"os": platform.system(), "release": platform.release(),
-                   "python": platform.python_version(), "cpu_count": psutil.cpu_count(),
-                   "ram_bytes": psutil.virtual_memory().total},
+                   "python": platform.python_version(),
+                   "cpu_count": psutil.cpu_count() if psutil else os.cpu_count(),
+                   "ram_bytes": psutil.virtual_memory().total if psutil else None},
         "tools_on_path": {name: shutil.which(name) is not None for name in
                           ("ollama", "docker", "nvcc", "gnat", "gnatprove", "sbcl",
                            "gcc", "g++", "cmake", "node", "npm")},

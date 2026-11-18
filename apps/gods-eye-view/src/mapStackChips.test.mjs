@@ -1,5 +1,5 @@
 import { readShellSource } from './testSupport/readShellSource.mjs';
-import { expandApplicationHtml } from '../build/application-html.js';
+import { expandApplicationHtml } from '../build-tools/application-html.js';
 import { readStylesheet } from './testSupport/readStylesheet.mjs';
 // MAP STACK chip row — the dropdown's replacement control surface.
 //

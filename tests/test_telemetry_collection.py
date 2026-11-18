@@ -26,6 +26,27 @@ def test_temperature_api_optional(monkeypatch):
     assert telemetry._probeDiskTemp() == []
 
 
+def test_snapshot_reads_swap_once_and_preserves_missing_network(monkeypatch):
+    calls = 0
+    def swap_memory():
+        nonlocal calls
+        calls += 1
+        return SimpleNamespace(total=4 * 1024**2, used=1024**2, percent=25)
+
+    monkeypatch.setattr(telemetry.psutil, 'swap_memory', swap_memory)
+    monkeypatch.setattr(telemetry.psutil, 'net_io_counters', lambda **_: None)
+    monkeypatch.setattr(telemetry, '_probeGpu', lambda: {'status': 'ok'})
+    monkeypatch.setattr(telemetry, '_probeDisks', lambda: [])
+    monkeypatch.setattr(telemetry, '_probeDiskTemp', lambda: [])
+    payload = telemetry.get_telemetry()
+    assert calls == 1
+    assert payload['system']['swap_total_mb'] == 4
+    assert payload['system']['swap_used_mb'] == 1
+    assert payload['system']['swap_percent'] == 25
+    assert payload['system']['network']['bytes_sent'] is None
+    assert payload['status'] == 'partial'
+
+
 def test_artifact_redaction():
     from scripts.make_process_telemetry import _sanitise
     assert _sanitise({"nested": [{"api_key": "secret", "cpu": 1}]}) == {

@@ -3,7 +3,7 @@ import { admitSameSiteRequest } from '../../../src/localRequestGate.mjs';
 import {
   isAllowedHost,
   resolveAllowedHosts,
-} from '../../../build/allowedHosts.js';
+} from '../../../build-tools/allowedHosts.js';
 
 /** Use the app's Host and request policies, with a required browser Origin. */
 export function isGeminiRequestOriginAllowed(

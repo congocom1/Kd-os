@@ -5,6 +5,13 @@ file records the packages added for the browser-local SDR feature and the
 Street Level viewer; the complete resolved dependency inventory remains in
 `package-lock.json`.
 
+## Vite build tooling
+
+The source in `build-tools/` restores the MIT-licensed build helpers from
+[upstream commit `3d9f153`](https://github.com/bilawalsidhu/gods-eye-view/tree/3d9f153bc055acc58d18c6a4b329f044816409a7/build).
+Copyright (c) 2026 Bilawal Sidhu; see `LICENSE`. This checkout uses
+`build-tools/` so the files are not confused with generated build output.
+
 ## Web RTL-SDR
 
 - Package: `@jtarrio/webrtlsdr` 3.0.6

@@ -1,5 +1,5 @@
 import { createNamedMarkers } from '../layers/installations/namedMarkers.js';
-import { expandApplicationHtml } from '../../build/application-html.js';
+import { expandApplicationHtml } from '../../build-tools/application-html.js';
 import { readStylesheet } from '../testSupport/readStylesheet.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';

@@ -11,10 +11,16 @@ Presence in the checkout is not proof that every live provider is available.
 
 ## Start
 
-1. Run `apps/gods-eye-view/launch-jarvis.sh` from the repo root.
-2. Open `http://127.0.0.1:4174` in a WebGL-capable browser.
-3. Start or restart JARVIS with `/home/hermes/Downloads/Mark-LVI-main/launch.sh`.
+1. From the repository root, install the workspace dependencies with
+   `PUPPETEER_SKIP_DOWNLOAD=true npm ci` using Node 24.14+ or Node 26.
+2. Run `apps/gods-eye-view/launch-jarvis.sh` and open `http://127.0.0.1:4174`
+   in a WebGL-capable browser.
+3. Start or restart JARVIS with `./kd start`.
 4. Ask JARVIS to open the globe, list its tools, or query its data.
+
+Alternatively, run `KD_START_GEV_DEV=1 ./kd start` to start both. KD does not
+wait for the globe to finish loading before opening the desktop. On exit it
+stops the globe only if that launch started it.
 
 The JARVIS launcher prefers `.venv/bin/python`, keeping its dependencies separate
 from the system Python. Override with `JARVIS_PYTHON` only when needed. Restore

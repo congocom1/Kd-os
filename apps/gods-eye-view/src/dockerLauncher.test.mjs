@@ -71,7 +71,8 @@ test('the Docker install path keeps its loopback-only, launcher-owned contract',
   assert.match(dockerfile, /^CMD \["node", "scripts\/docker-start\.mjs"\]$/m, 'the launcher is the container entry point');
 
   const compose = readFileSync(new URL('../compose.yaml', import.meta.url), 'utf8');
-  assert.match(compose, /^\s+- "127\.0\.0\.1:4173:4173"$/m, 'the port is published on the host loopback only');
+  assert.match(compose, /^\s+target: development$/m, 'standalone Compose uses the dev launcher');
+  assert.match(compose, /^\s+- "127\.0\.0\.1:4174:4174"$/m, 'the port is published on the host loopback only');
   assert.match(compose, /^\s+- GEV_KEY_SETUP_TRUSTED_PEERS$/m, 'the operator policy reaches the launcher without a hard-coded address');
   assert.match(compose, /^\s+- GEV_ALLOWED_HOSTS$/m, 'the host allowlist reaches Vite');
   assert.doesNotMatch(compose, /network_mode/, 'the container keeps its own network namespace');

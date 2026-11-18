@@ -10,7 +10,7 @@ import {
   BROWSER_CSP,
   createBrowserViteConfig,
   escapeFsDenyPath,
-} from '../../build/vite.js';
+} from '../../build-tools/vite.js';
 import standaloneConfig, * as compatibility from '../../vite.config.js';
 import * as providers from '../../server/providers/local.js';
 import { apiNotFoundPlugin } from '../../server/standalone/api-not-found.js';
@@ -35,6 +35,7 @@ test('explicit build inputs preserve browser-only defines, plugin order and loop
   assert.deepEqual(config.server.allowedHosts, ['localhost', '127.0.0.1']);
   assert.ok(config.server.fs.deny.includes('**/ENVIRONMENT'));
   assert.ok(config.server.fs.deny.includes('.env.*'));
+  assert.ok(config.server.fs.deny.includes('**/config/api_keys.*'));
   assert.ok(config.server.fs.deny.includes('**/.gev-logs/**'));
   assert.ok(config.server.fs.deny.includes('**/.gev-cache/**'));
   const root = fileURLToPath(new URL('../../', import.meta.url))
@@ -157,18 +158,34 @@ test('directories the server writes while it runs are kept out of the dev watche
   ]);
 });
 
+test('build includes Cesium runtime assets when dependencies live outside the project root', async (t) => {
+  const root = await makeFixtureRoot('gev-cesium-assets-');
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(path.join(root, 'index.html'), '<!doctype html><title>Fixture</title>');
+  await build({
+    ...createBrowserViteConfig({ command: 'build' }),
+    root,
+    configFile: false,
+    publicDir: false,
+    logLevel: 'silent',
+  });
+  for (const asset of ['Cesium.js', 'Widgets/widgets.css', 'Assets/approximateTerrainHeights.json']) {
+    assert.ok(readFileSync(path.join(root, 'dist', 'cesium', asset)).length > 0, asset);
+  }
+});
+
 test('build export resolves in Node and has no browser fallback', async () => {
   const exported = await import('gods-eye-view/build/vite');
   assert.equal(exported.createBrowserViteConfig, createBrowserViteConfig);
   const pkg = JSON.parse(
     readFileSync(new URL('../../package.json', import.meta.url)),
   );
-  assert.deepEqual(pkg.exports['./build/vite'], { node: './build/vite.js' });
+  assert.deepEqual(pkg.exports['./build/vite'], { node: './build-tools/vite.js' });
 });
 
 test('only embed-mode documents may be framed, and only by the allowed ancestors', async () => {
   const { embedFramingPlugin, isEmbedDocumentRequest } =
-    await import('../../build/embed-framing.js');
+    await import('../../build-tools/embed-framing.js');
   assert.equal(isEmbedDocumentRequest('/?embed=1'), true);
   assert.equal(isEmbedDocumentRequest('/index.html?embed=1#v=2'), true);
   assert.equal(isEmbedDocumentRequest('/?embed=0'), false);

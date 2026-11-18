@@ -10,6 +10,7 @@ from __future__ import annotations
 import atexit
 import logging
 import os
+import shutil
 import signal
 import subprocess
 import time
@@ -64,9 +65,12 @@ def _kill_by_port(port: int) -> None:
         pass
 
 
-def _wait_for_service(url: str, attempts: int = 30, delay: float = 0.5) -> bool:
-    """Poll a local URL until it responds or attempts run out."""
+def _wait_for_service(url: str, attempts: int = 30, delay: float = 0.5,
+                      process: subprocess.Popen | None = None) -> bool:
+    """Poll a local URL until it responds, the child exits, or time runs out."""
     for _ in range(attempts):
+        if process is not None and process.poll() is not None:
+            return False
         if _is_port_open(url):
             return True
         time.sleep(delay)
@@ -90,55 +94,51 @@ class AppManager:
         if cls.is_gev_running():
             return {"status": "already_running", "url": GEV_URL}
 
-        gev_dir = Path(os.environ.get("GODS_EYE_VIEW_DIR", GEV_DIR))
-        vite_bin = gev_dir / "node_modules" / "vite" / "bin" / "vite.js"
-        if not vite_bin.exists():
-            return {
-                "status": "failed",
-                "reason": f"Vite not found at {vite_bin}. Run npm install in {gev_dir}",
-            }
+        gev_dir = Path(os.environ.get("GODS_EYE_VIEW_DIR", GEV_DIR)).expanduser().resolve()
+        local = gev_dir / "node_modules" / "vite" / "bin" / "vite.js"
+        hoisted = BASE_DIR / "node_modules" / "vite" / "bin" / "vite.js"
+        vite_bin = local if local.is_file() else hoisted
+        if not vite_bin.is_file():
+            return {"status": "failed", "reason": "Vite not installed. Run npm ci at the repository root."}
 
-        cmd = [
-            "node",
-            str(vite_bin),
-            "--host", "127.0.0.1",
-            "--port", "4174",
-            "--strictPort",
-        ]
-        logger.info("Starting God's Eye View server: %s", " ".join(cmd))
-        proc = subprocess.Popen(
-            cmd,
-            cwd=str(gev_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        node_name = "node.exe" if os.name == "nt" else "node"
+        bundled_node = gev_dir / ".jarvis-runtime" / "node_modules" / "node" / "bin" / node_name
+        node = shutil.which(str(bundled_node)) or shutil.which("node")
+        if node is None:
+            return {"status": "failed", "reason": "God's Eye View requires Node 24.14+ or 26."}
+        cmd = [node, str(vite_bin), "--host", "127.0.0.1", "--port", "4174", "--strictPort"]
+        try:
+            # Unread stdout/stderr pipes can block a live dev server.
+            proc = subprocess.Popen(cmd, cwd=gev_dir)
+        except OSError as exc:
+            logger.warning("Could not launch God's Eye View (%s)", type(exc).__name__)
+            return {"status": "failed", "reason": "Could not launch God's Eye View."}
         _processes["gev"] = proc
 
-        if _wait_for_service(GEV_URL):
+        if _wait_for_service(GEV_URL, process=proc):
             return {"status": "started", "url": GEV_URL}
 
         cls.stop_gev()
-        return {"status": "failed", "reason": "Server did not start in time"}
+        return {"status": "failed", "reason": "Server did not become ready; check the launch output."}
 
     @classmethod
     def stop_gev(cls) -> dict:
-        """Stop the God's Eye View server."""
+        """Stop only the globe process started by this manager."""
         proc = _processes.get("gev")
-        if proc is not None:
-            try:
+        if proc is None:
+            return {"status": "not_managed", "reason": "No globe process started by this manager."}
+        try:
+            if proc.poll() is None:
                 proc.terminate()
-                proc.wait(timeout=3)
-            except Exception:
                 try:
+                    proc.wait(timeout=3)
+                except subprocess.TimeoutExpired:
                     proc.kill()
-                except Exception:
-                    pass
-            _processes["gev"] = None
-
-        # Fallback: kill by port/pattern.
-        _kill_by_port(4174)
-        subprocess.run(["pkill", "-f", "vite.js"], capture_output=True, timeout=3)
-        subprocess.run(["pkill", "-f", "node.*4174"], capture_output=True, timeout=3)
+                    proc.wait(timeout=3)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            logger.warning("Could not stop managed globe process (%s)", type(exc).__name__)
+            return {"status": "failed", "reason": "Could not stop the managed globe process."}
+        _processes["gev"] = None
         return {"status": "stopped"}
 
     @classmethod

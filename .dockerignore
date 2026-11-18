@@ -18,6 +18,12 @@ apps/*/dist/
 apps/*/build/
 
 # Runtime data (mounted as volumes)
+.env
+.env.*
+config/api_keys.*
+!config/api_keys.example.json
+config/certs/
+config/whatsapp_web/
 data/cache/*
 !data/cache/.gitkeep
 data/logs/*

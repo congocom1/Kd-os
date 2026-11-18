@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
-import { resolveAllowedHosts } from '../../build/allowedHosts.js';
-import { createBrowserViteConfig } from '../../build/vite.js';
+import { resolveAllowedHosts } from '../../build-tools/allowedHosts.js';
+import { createBrowserViteConfig } from '../../build-tools/vite.js';
 import { localProviderPlugins } from '../providers/local.js';
 import { localMcpPlugin } from '../mcp/plugin.js';
 import { apiNotFoundPlugin } from './api-not-found.js';

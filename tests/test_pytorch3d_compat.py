@@ -1,6 +1,7 @@
 """Regression tests for the explicitly limited tensor geometry backend."""
 import pytest
-import torch
+
+torch = pytest.importorskip('torch')
 
 from core import pytorch3d_compat as geometry
 

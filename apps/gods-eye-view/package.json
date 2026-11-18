@@ -83,7 +83,7 @@
     "./application": "./src/app/application.js",
     "./application/viewer": "./src/app/viewer.js",
     "./build/vite": {
-      "node": "./build/vite.js"
+      "node": "./build-tools/vite.js"
     },
     "./server/providers/live": {
       "node": "./server/providers/live.js"
@@ -213,7 +213,7 @@
     "./annotations": "./src/annotations/index.js",
     "./context": "./src/data/contextStore.js",
     "./build/html": {
-      "node": "./build/application-html.js"
+      "node": "./build-tools/application-html.js"
     },
     "./application/catalog": "./src/app/catalog.js",
     "./standalone/catalog": "./src/standalone/catalog.js",

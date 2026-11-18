@@ -51,6 +51,15 @@ def test_ollama_responses(monkeypatch, body, status):
         assert result["inference"] == "not_tested"
 
 
+def test_doctor_can_report_before_install(monkeypatch):
+    monkeypatch.setattr(diagnostics, 'psutil', None)
+    monkeypatch.setattr(diagnostics, 'gpu_inventory', lambda: {})
+    monkeypatch.setattr(diagnostics, 'ollama_inventory', lambda: {})
+    report = diagnostics.collect()
+    assert report['system']['python']
+    assert report['system']['ram_bytes'] is None
+
+
 def test_redirects_refused():
     assert diagnostics._NoRedirect().redirect_request(
         None, None, 302, "", {}, "https://example.com") is None

@@ -93,7 +93,7 @@ Test modules and the Node-only allocation benchmark are outside browser runtime.
 
 ## Build and standalone server configuration
 
-`gods-eye-view/build/vite` is a separate Node-only export. `build/vite.js`
+`gods-eye-view/build/vite` is a separate Node-only export. `build-tools/vite.js`
 creates standard Cesium/Vite browser settings from explicit inputs. It imports
 only the declared `vite-plugin-cesium` build dependency, discovers no environment,
 and constructs no provider middleware. Call it from a Vite configuration:

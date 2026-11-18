@@ -1,6 +1,6 @@
 import { encodeParams, decodeParams } from '../layers/streetLevel/params.js';
 import { readShellSource } from '../testSupport/readShellSource.mjs';
-import { expandApplicationHtml } from '../../build/application-html.js';
+import { expandApplicationHtml } from '../../build-tools/application-html.js';
 import { readLayerSource } from '../testSupport/readLayerSource.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';

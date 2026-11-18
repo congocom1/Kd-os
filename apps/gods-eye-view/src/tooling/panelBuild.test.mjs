@@ -10,7 +10,7 @@ import {
   panelBuildConfig,
   panelBuildPlugin,
   workerFilesPrelude,
-} from '../../build/panel.js';
+} from '../../build-tools/panel.js';
 
 test('the panel loads the paths the panel build writes', () => {
   assert.equal(PANEL_BASE, PANEL_PATHS.PANEL_BASE);

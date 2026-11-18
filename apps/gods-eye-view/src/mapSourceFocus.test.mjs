@@ -1,5 +1,5 @@
 import { shellMethod } from './testSupport/readShellSource.mjs';
-import { expandApplicationHtml } from '../build/application-html.js';
+import { expandApplicationHtml } from '../build-tools/application-html.js';
 import { createHoverDisclosure, collapsePanelOnEscape } from './ui/panelDisclosure.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';

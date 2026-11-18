@@ -65,6 +65,28 @@ def test_clean_disconnect_and_reconnect(paired):
             assert ws.receive_json()['status'] == 'partial'
 
 
+def test_http_and_websocket_reuse_a_probe(monkeypatch):
+    calls = 0
+    def collect():
+        nonlocal calls
+        calls += 1
+        return {'system': {'cpu_percent': 12}}
+
+    monkeypatch.setattr(module, 'get_telemetry', collect)
+    monkeypatch.setattr(module, 'TELEMETRY_INTERVAL_S', 60)
+    server = module.DashboardServer()
+    server._tokens['paired'] = time.time()
+    with TestClient(server.app) as client:
+        assert client.get('/api/telemetry').status_code == 401
+        assert calls == 0
+        with client.websocket_connect('/ws/telemetry?token=paired') as ws:
+            stream = ws.receive_json()
+            http = client.get('/api/telemetry', headers={'Authorization': 'Bearer paired'})
+            assert http.status_code == 200
+            assert http.json() == {**stream, 'cpu': 12}
+        assert calls == 1
+
+
 def test_actual_served_page_has_telemetry_controls(paired):
     _, client, _ = paired
     response = client.get('/')

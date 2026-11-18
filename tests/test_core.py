@@ -77,12 +77,13 @@ def test_scene():
     assert info["faces"] == 12
 
 
-def test_wake_word_ready():
-    """Test wake word module loads."""
+def test_wake_word_is_optional(monkeypatch):
+    """A fresh install reports wake-word unavailability without loading a model."""
     from core.wake_word import is_installed, is_ready
 
-    assert is_installed()
-    # is_ready() may be False if model not downloaded, but that's OK
+    monkeypatch.setitem(sys.modules, "openwakeword", None)
+    assert not is_installed()
+    assert not is_ready()
 
 
 def test_plugin_loader():

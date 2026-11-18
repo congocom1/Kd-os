@@ -6,7 +6,8 @@
 
 # ── Secrets. Committing any of these publishes them. ──────────────────────────
 # NOTE: gitignore does not support trailing comments — each pattern stands alone.
-config/api_keys.json
+config/api_keys.*
+!config/api_keys.example.json
 config/certs/
 config/whatsapp_web/
 **/token*.json
@@ -48,6 +49,7 @@ Thumbs.db
 desktop.ini
 
 # ── Runtime output ────────────────────────────────────────────────────────────
+/.kd-instance.lock
 *.log
 logs/
 downloads/
@@ -62,7 +64,7 @@ screenshots/
 !/data/shared/.gitkeep
 
 # ── Monorepo app build artifacts and dependencies ─────────────────────────────
-/apps/*/node_modules/
+node_modules/
 /apps/*/.jarvis-runtime/
 /apps/*/dist/
 /apps/*/.venv/

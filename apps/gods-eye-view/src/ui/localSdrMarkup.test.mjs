@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { expandApplicationHtml } from '../../build/application-html.js';
-import { createBrowserViteConfig } from '../../build/vite.js';
+import { expandApplicationHtml } from '../../build-tools/application-html.js';
+import { createBrowserViteConfig } from '../../build-tools/vite.js';
 import { R820T_GAIN_STEPS_DB } from '../sdr/gain.js';
 
 const html = expandApplicationHtml(

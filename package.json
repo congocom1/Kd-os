@@ -7,12 +7,12 @@
     "apps/gods-eye-view"
   ],
   "scripts": {
-    "dev:gev": "npm run dev --workspace=apps/gods-eye-view",
-    "build:gev": "npm run build --workspace=apps/gods-eye-view",
-    "test:gev": "npm run test --workspace=apps/gods-eye-view",
-    "mcp:gev": "npm run mcp --workspace=apps/gods-eye-view"
+    "dev:gev": "npm run dev --workspace=apps/gods-eye-view --",
+    "build:gev": "npm run build --workspace=apps/gods-eye-view --",
+    "test:gev": "npm run test --workspace=apps/gods-eye-view --",
+    "mcp:gev": "npm run mcp --workspace=apps/gods-eye-view --"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24.14.0 <25 || >=26 <27"
   }
 }
