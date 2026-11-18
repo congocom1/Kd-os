@@ -1,0 +1,1 @@
+{"schema_version":1,"run":"autoplan-mark-lvi-20261026-134124","id":"autoplan-mark-lvi-20261026-134124-plan1","label":"PLAN1","title":"Approve /autoplan review of GLOBE_INTEGRATION.md and proceed with surfaced fixes?","options":["a","b","c","d"],"recommended":"a","kind":"approval","status":"pending","default_if_unanswered":null,"gate_rev":1}

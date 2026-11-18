@@ -1,0 +1,64 @@
+{
+  "widgets": [
+    {
+      "widget_id": "metrics_main",
+      "widget_type": "metrics",
+      "title": "System Metrics",
+      "enabled": true,
+      "position": "top-right",
+      "size": [
+        320,
+        240
+      ],
+      "refresh_interval": 1.0,
+      "opacity": 0.9,
+      "click_through": false,
+      "draggable": true
+    },
+    {
+      "widget_id": "task_progress_main",
+      "widget_type": "task_progress",
+      "title": "Active Task",
+      "enabled": true,
+      "position": "top-left",
+      "size": [
+        400,
+        100
+      ],
+      "refresh_interval": 0.5,
+      "opacity": 0.9,
+      "click_through": false,
+      "draggable": true
+    },
+    {
+      "widget_id": "speaker_main",
+      "widget_type": "speaker_id",
+      "title": "Speaker",
+      "enabled": true,
+      "position": "bottom-left",
+      "size": [
+        250,
+        80
+      ],
+      "refresh_interval": 0.5,
+      "opacity": 0.9,
+      "click_through": false,
+      "draggable": true
+    },
+    {
+      "widget_id": "window_context_main",
+      "widget_type": "window_context",
+      "title": "Window Context",
+      "enabled": true,
+      "position": "bottom-right",
+      "size": [
+        350,
+        120
+      ],
+      "refresh_interval": 1.0,
+      "opacity": 0.9,
+      "click_through": false,
+      "draggable": true
+    }
+  ]
+}

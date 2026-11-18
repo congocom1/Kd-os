@@ -1,0 +1,1 @@
+"""Reviewed third-party components with adjacent license and provenance."""

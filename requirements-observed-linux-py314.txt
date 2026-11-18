@@ -1,0 +1,59 @@
+# OBSERVED direct-dependency constraints — NOT a production lock.
+# Provenance: importlib.metadata in the shared Anaconda CPython 3.14.9 Linux
+# environment supplied for this worktree. Only active requirements.txt roots
+# were sampled; this is NOT pip freeze and contains no unrelated packages.
+# All recorded versions satisfy their declared requirements.txt bounds.
+# No clean-environment resolution, artifact/hash verification, runtime or
+# cross-platform certification was performed. Transitive dependencies and
+# build tools remain unlocked; optional pyproject extras are not constrained.
+# Windows-only requirements retain their markers in requirements.txt and
+# were NOT installed or guessed here. These constraints apply only to Linux
+# CPython 3.14; other targets need independently resolved/tested lockfiles.
+# Shared pip check FAILED: transformers vs huggingface-hub/safetensors;
+# opentelemetry exporter and anaconda-opentelemetry vs installed OTEL versions.
+# Do not treat that environment as a reproducible or compatible production base.
+# Usage ONLY inside a fresh, disposable target virtual environment:
+# python -m pip install -r requirements.txt -c requirements-observed-linux-py314.txt
+# Then run pip check and application tests; resolution can still fail.
+# Updating (including yt-dlp): resolve in an isolated target environment,
+# verify all extras/markers and generate a full hash-locked dependency closure.
+# Do not regenerate by freezing the shared conda environment.
+
+PyQt6==6.11.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+sounddevice==0.5.6; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+numpy==2.5.4; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+google-genai==2.33.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+httpx==0.28.1; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+requests==2.34.2; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+beautifulsoup4==4.15.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+playwright==1.64.1; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+yt-dlp==2026.10.21; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+pyautogui==0.9.54; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+pyperclip==1.11.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+pillow==12.3.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+opencv-python==4.14.0.94; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+mss==10.2.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+psutil==7.2.2; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+send2trash==2.1.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+python-pptx==1.0.2; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+croniter==7.0.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+keyring==25.7.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+fastapi==0.162.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+uvicorn==0.54.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+cryptography==49.0.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+python-multipart==0.0.9; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+qrcode==8.2; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+google-api-python-client==2.201.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+google-auth-oauthlib==1.5.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+tinytuya==1.20.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+paho-mqtt==2.1.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+openpyxl==3.1.5; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+youtube-transcript-api==1.2.4; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+pygetwindow==0.0.9; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+ddgs==9.16.1; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+pdfplumber==0.11.10; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+PyPDF2==3.0.1; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+python-docx==1.2.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+pynvml==13.0.1; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+joblib==1.6.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"
+dnspython==2.9.0; sys_platform == "linux" and python_version == "3.14" and platform_python_implementation == "CPython"

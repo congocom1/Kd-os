@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.1",
+  "program": "KD release engineering release checklist",
+  "observed_at": "2026-11-16T00:00:00+00:00",
+  "source": {
+    "checked_out": "/home/hermes/.cline/worktrees/ec023/Mark-LVI-main",
+    "primary_requested": "/home/hermes/Downloads/Mark-LVI-main",
+    "git_accessible": false,
+    "notes": "Primary checkout missing; Git metadata points into a non-existent repository. Subsequent steps are verified in the worktree only."
+  },
+  "environment": {
+    "platform": "Linux x86_64",
+    "os_release": "Ubuntu 26.04.1 LTS",
+    "cpu_count": 16,
+    "ram_bytes": 15_582_771_200,
+    "gpu": [
+      {
+        "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driver": "595.99.02",
+        "vram_mib": 8151
+      }
+    ],
+    "ollama": {
+      "reachable": true,
+      "model_count": 15,
+      "local_models": [
+        "qwen3.5:4b",
+        "qwen3.5:9b",
+        "qwen3.5:27b",
+        "deepseek-r1:8b",
+        "gemma3:4b",
+        "granite4:3b",
+        "embeddinggemma:latest",
+        "qwen3-embedding:0.6b",
+        "qwen3-vl:4b",
+        "qwen3:4b",
+        "qwen3.5:0.8b",
+        "qwen3.5:2b",
+        "qwen3.5:35b",
+        "qwen3.5:27b",
+        "hf.co/bartowski/Qwen_Qwen3-4B-GGUF:Q6_K"
+      ]
+    },
+    "dependencies": {
+      "faster_whisper": "1.2.1",
+      "piper_tts": "1.8.0",
+      "torch": "2.14.1",
+      "onnxruntime": "1.31.0",
+      "onnxruntime_gpu": "not_installed_cpu_only",
+      "sounddevice": "0.5.6",
+      "PyQt6": "6.11.0",
+      "fastapi": "0.162.0",
+      "uvicorn": "present",
+      "psutil": "present",
+      "openwakeword": "present",
+      "whisper": "present",
+      "pyannote": "not_installed",
+      "speechbrain": "not_installed"
+    }
+  },
+  "implementation_status": {
+    "backend_camera_ownership": "implemented_and_unit_tested",
+    "frontend_module_availability": "implemented_and_unit_tested",
+    "dashboard_network_boundaries": "implemented_and_unit_tested",
+    "dependency_doctor": "implemented_and_run",
+    "voice_pipeline": "blocked_missing_impl",
+    "speaker_profiles": "blocked_missing_impl",
+    "durable_memory": "blocked_missing_impl",
+    "unified_search": "blocked_missing_impl",
+    "gpu_scheduler": "blocked_missing_impl",
+    "scheduled_workflows": "blocked_missing_impl",
+    "connector_router": "blocked_missing_impl",
+    "command_center_ui": "blocked_missing_impl"
+  },
+  "verification_telemetry": {
+    "synthetic_inference": false,
+    "frontend_protocol_tests": 3,
+    "backend_focused_tests": 18,
+    "camera_lease_tests": 14,
+    "dashboard_boundary_tests": 5,
+    "dependency_audit_tests": 4,
+    "frontend_production_build": true,
+    "frontend_ci": "passed",
+    "python_ppython_package_compiles": true,
+    "bash_launcher_syntax": true,
+    "dependency_doctor_run": "passed",
+    "local_ollama_streaming": "synthetic_pass"
+  },
+  "evidence_files": {
+    "focused_suite": "docs/evidence/kd-hardening/focused-final.log",
+    "frontend_test": "docs/evidence/kd-hardening/frontend-final.log",
+    "frontend_build": "docs/evidence/kd-hardening/build-final.log",
+    "local_inference": "docs/evidence/kd-hardening/local-inference.json",
+    "npm_audit": "docs/evidence/kd-hardening/npm-audit.json",
+    "diagnostics": "artifacts/diagnostics.json",
+    "dependency_report": "artifacts/dependency_doctor.json"
+  },
+  "remaining_product_gates": [
+    "Offline microphone -> VAD -> transcript -> local response -> spoken audio pipeline",
+    "French/English voice selection and push-to-talk",
+    "Microphone mute and interruption state",
+    "Speaker enrollment and verification (enrolled, unknown, uncertain)",
+    "Durable conversation history, deletion and export",
+    "Hybrid local/keyword unified search with source citations",
+    "Low VRAM GPU scheduling with queueing and cancellation",
+    "Timezone-aware workflow scheduler with audit records",
+    "Connector credential management and approval-bound external sends",
+    "Command-center dashboard, GPU telemetry and active-window inspection",
+    "Health/readiness endpoints and systemd user service packaging",
+    "Lint, type checks, full test suite, and dependency pinning"
+  ],
+  "production_readiness": false,
+  "production_readiness_basis": "No full production smoke, no physical mic/camera, no red-team verification, and the Git metadata cannot be verified because the primary checkout is missing."
+}

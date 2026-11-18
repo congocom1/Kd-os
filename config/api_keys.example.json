@@ -1,0 +1,78 @@
+{
+  "gemini_api_key": "PASTE_YOUR_GEMINI_API_KEY_HERE",
+  "os_system": "linux",
+  "firms_map_key": "",
+  "google_places_api_key": "",
+  "camera_index": 0,
+  "wake_word_enabled": false,
+  "hud_style": "cinematic",
+  "providers": {
+    "mode": "gemini",
+    "pipeline": {
+      "stt": "gemini",
+      "llm": "gemini",
+      "tts": "gemini"
+    },
+    "creds": {
+      "whisper": {
+        "backend": "faster-whisper",
+        "base_url": "",
+        "api_key": "",
+        "catalog": "Systran/faster-whisper-base",
+        "model": "base",
+        "device": "cpu",
+        "language": "auto",
+        "download_root": ""
+      },
+      "openai_compat": {
+        "base_url": "http://localhost:11434/v1",
+        "max_tools": "16",
+        "max_tool_chars": "4000",
+        "catalog": "",
+        "model": "",
+        "api_key": "",
+        "vision": "false",
+        "vision_model": ""
+      },
+      "piper": {
+        "catalog": "",
+        "voice": "",
+        "follow_language": "true",
+        "speed": "1.0",
+        "use_cuda": "false"
+      }
+    },
+    "sidecar": "",
+    "sidecar_first": false
+  },
+  "assistant_name": "Jarvis",
+  "user_name": "",
+  "ui_color": "cyan",
+  "plugin_config": {
+    "social_media": {
+      "x": { "token": "" },
+      "x_token": "",
+      "youtube_token": "",
+      "instagram_token": "",
+      "facebook_token": "",
+      "discord_token": "",
+      "telegram_token": "",
+      "reddit_token": ""
+    },
+    "calculator": { "max_result_digits": "12" },
+    "personal_notes": { "default_category": "general" },
+    "studio_modeler": {
+      "default_resolution": "64",
+      "default_output_dir": ""
+    },
+    "system_info": { "cpu_interval": "1.0" },
+    "unit_converter": { "default_precision": "4" },
+    "vision_learner": {
+      "camera_index": "0",
+      "feature_size": "512",
+      "auto_save_model": true
+    },
+    "sqlite_commands": { "db_path": "" },
+    "whatsapp_connector": { "app_name": "WhatsApp" }
+  }
+}

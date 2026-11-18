@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>JARVIS</title>
+  <style>
+    @font-face { font-family: 'Orbitron'; src: url('/fonts/Orbitron-Variable.ttf'); font-weight: 400 900; }
+    @font-face { font-family: 'Rajdhani'; src: url('/fonts/Rajdhani-Medium.ttf'); font-weight: 500; }
+    @font-face { font-family: 'Rajdhani'; src: url('/fonts/Rajdhani-SemiBold.ttf'); font-weight: 600; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:     #050403;
+      --accent: #ff9500;
+      --amber:  #ffb84d;
+      --plasma: #7fd4ff;
+      --text:   #ffe9c9;
+      --muted:  #a8834f;
+      --border: rgba(255,149,0,0.22);
+      --card:   rgba(255,149,0,0.05);
+    }
+    html, body {
+      height: 100%;
+      background:
+        radial-gradient(ellipse at 50% 38%, rgba(255,149,0,0.10), transparent 55%),
+        repeating-linear-gradient(60deg, rgba(255,149,0,0.028) 0 1px, transparent 1px 34px),
+        repeating-linear-gradient(-60deg, rgba(255,149,0,0.028) 0 1px, transparent 1px 34px),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      position: relative;
+      width: 360px;
+      padding: 46px 38px 38px;
+      background: rgba(10, 6, 1, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(255,149,0,0.10), inset 0 0 40px rgba(255,149,0,0.04);
+      overflow: hidden;
+    }
+    .card::before {           /* scanline sweep */
+      content: '';
+      position: absolute; left: 0; right: 0; top: -30%;
+      height: 30%;
+      background: linear-gradient(to bottom, transparent, rgba(255,149,0,0.06), transparent);
+      animation: scan 4.5s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes scan { from { top: -30%; } to { top: 110%; } }
+
+    /* ── arc-reactor mark ── */
+    .reactor {
+      position: relative;
+      width: 92px; height: 92px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 0%, var(--amber) 18%, rgba(255,149,0,0.55) 34%, rgba(255,149,0,0.10) 58%, transparent 70%);
+    }
+    .reactor::before, .reactor::after {
+      content: '';
+      position: absolute; inset: -8px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--accent);
+      border-right-color: rgba(255,149,0,0.35);
+      animation: spin 5s linear infinite;
+    }
+    .reactor::after {
+      inset: -16px;
+      border-width: 1px;
+      border-top-color: rgba(255,149,0,0.5);
+      border-left-color: rgba(255,149,0,0.18);
+      animation-duration: 9s;
+      animation-direction: reverse;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 12px;
+      margin-bottom: 6px;
+      text-shadow: 0 0 18px rgba(255,149,0,0.45);
+    }
+    .logo em { color: var(--accent); font-style: normal; }
+    .sub {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 10px;
+      color: var(--plasma);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .owner {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 26px;
+    }
+    .key-wrap { position: relative; margin-bottom: 16px; }
+    .key-input {
+      width: 100%;
+      padding: 17px 14px;
+      background: rgba(255,149,0,0.06);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 30px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      letter-spacing: 10px;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+      caret-color: var(--accent);
+    }
+    .key-input::placeholder { color: rgba(168,131,79,0.4); letter-spacing: 6px; font-size: 20px; }
+    .key-input:focus {
+      border-color: var(--accent);
+      background: rgba(255,149,0,0.10);
+      box-shadow: 0 0 0 3px rgba(255,149,0,0.12), 0 0 24px rgba(255,149,0,0.15);
+    }
+    .err { font-size: 12px; color: #f87171; min-height: 18px; margin-bottom: 14px; }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(180deg, var(--amber), var(--accent));
+      color: #1a0e00;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 22px rgba(255,149,0,0.30);
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+    }
+    .btn:hover  { opacity: 0.92; box-shadow: 0 0 32px rgba(255,149,0,0.45); }
+    .btn:active { transform: scale(0.98); }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-7px); }
+      40%,80% { transform: translateX(7px); }
+    }
+    .shake { animation: shake 0.35s ease; }
+    .voice-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 20px;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .voice-note code {
+      background: rgba(255,149,0,0.10);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+    }
+    #reconnecting { display: none; color: var(--plasma); font-size: 12px; margin-bottom: 16px; letter-spacing: 2px; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="reactor"></div>
+    <div class="logo"><em>J</em>ARVIS</div>
+    <div class="sub">Remote Access</div>
+    <div class="owner">by Michel Buki</div>
+    <p id="reconnecting">Reconnecting…</p>
+    <p class="hint">Press <strong style="color:var(--text)">Remote Control</strong> in the JARVIS desktop app to get a QR code or session key.</p>
+    <div class="key-wrap">
+      <input class="key-input" id="key" type="text" maxlength="8"
+             autocomplete="new-password" autocorrect="off" spellcheck="false"
+             inputmode="text" enterkeyhint="done"
+             placeholder="· · · · · · · ·">
+    </div>
+    <div class="err" id="err"></div>
+    <button class="btn" onclick="doLogin()">CONNECT</button>
+    <button class="btn" style="background:transparent;border:1.5px solid var(--border);color:var(--text);margin-top:10px;" onclick="newKey()">NEW KEY</button>
+    <p class="voice-note">
+      🎤 <strong style="color:var(--text)">Voice commands:</strong> open
+      <code>chrome://flags</code> on your phone, search
+      <code>Insecure origins treated as secure</code>, add your JARVIS URL, tap Relaunch.
+    </p>
+  </div>
+
+  <script>
+    // Try auto-reconnect with stored device token (set on first QR login)
+    (async function() {
+      const devTok = localStorage.getItem('jarvis_device_token');
+      if (!devTok) return;
+      document.getElementById('reconnecting').style.display = 'block';
+      try {
+        const r = await fetch('/api/device-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ device_token: devTok }),
+        });
+        const d = await r.json();
+        if (d.ok && d.token) {
+          sessionStorage.setItem('jarvis_key', d.key);
+          sessionStorage.setItem('jarvis_token', d.token);
+          location.replace('/');
+          return;
+        }
+      } catch (_) {}
+      // Device token rejected (server restarted) — clear it and show normal form
+      localStorage.removeItem('jarvis_device_token');
+      document.getElementById('reconnecting').style.display = 'none';
+    })();
+
+    const inp = document.getElementById('key');
+    inp.focus();
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.toUpperCase().replace(/[^A-Z2-9]/g, '');
+      if (inp.value.length === 8) doLogin();
+    });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+    async function doLogin() {
+      const key = inp.value.trim();
+      if (key.length < 8) { shake(); return; }
+      let data;
+      try {
+        const r = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: key })
+        });
+        data = await r.json();
+      } catch (e) {
+        document.getElementById('err').textContent = 'Connection error';
+        shake(); return;
+      }
+      if (data.ok && data.token) {
+        sessionStorage.setItem('jarvis_key', key);
+        sessionStorage.setItem('jarvis_token', data.token);
+        location.href = '/';
+      } else {
+        inp.value = '';
+        inp.focus();
+        document.getElementById('err').textContent = 'Invalid or expired key';
+        shake();
+      }
+    }
+
+    function shake() {
+      const c = document.getElementById('card');
+      c.classList.remove('shake');
+      void c.offsetWidth;
+      c.classList.add('shake');
+    }
+
+    async function newKey() {
+      const err = document.getElementById('err');
+      err.textContent = '';
+      try {
+        const r = await fetch('/api/new-key', { method: 'POST' });
+        const d = await r.json();
+        if (d.ok && d.key) {
+          inp.value = d.key;
+          inp.focus();
+          // Auto-submit once we have a full 8-char key
+          if (d.key.length >= 8) doLogin();
+        } else {
+          err.textContent = d.error || 'Could not generate key';
+          shake();
+        }
+      } catch (e) {
+        err.textContent = 'Connection error';
+        shake();
+      }
+    }
+  </script>
+</body>
+</html>

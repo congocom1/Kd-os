@@ -1,0 +1,36 @@
+# MARK LVI — source-distribution manifest.
+# Secrets, personal data and dev artifacts never ship in an sdist.
+
+exclude config/api_keys.json
+exclude .env
+exclude .env.*
+recursive-exclude config certs whatsapp_web
+recursive-exclude memory *.db
+exclude memory/long_term.json
+
+exclude jarvis.log
+exclude nohup.out
+recursive-exclude . *.log
+recursive-exclude . __pycache__ *.py[cod]
+recursive-exclude . *.egg-info
+
+exclude docker-compose.yml
+exclude Dockerfile
+recursive-exclude tests *
+recursive-exclude demos *
+recursive-exclude docs *
+prune .gstack
+prune .pytest_cache
+prune .vscode
+prune installer/build
+prune installer/dist
+prune release
+
+include README.md
+include LICENSE
+include config/api_keys.example.json
+include config/jarvis.png
+include config/jarvis.ico
+recursive-include core *.obj *.txt *.json *.png *.ico
+recursive-include dashboard/static *
+recursive-include assets/models arc_reactor*.obj arc_reactor*.mtl arc_reactor*.json

@@ -1,0 +1,60 @@
+JARVIS — END-USER LICENSE AGREEMENT (EULA)
+Copyright (c) 2026 Michel Buki. All rights reserved.
+
+IMPORTANT — READ CAREFULLY. By installing, copying, or otherwise using the
+JARVIS software product (the "Software"), you agree to be bound by the terms
+of this Agreement. If you do not agree, do not install or use the Software.
+
+1. GRANT OF LICENSE
+   Subject to payment of the applicable license fee and compliance with this
+   Agreement, the Licensor grants you a non-exclusive, non-transferable,
+   revocable license to install and use the Software, for personal or
+   commercial purposes, on the number of machines covered by your purchase.
+
+2. RESTRICTIONS
+   You may NOT:
+   a) redistribute, resell, sublicense, rent, lease, or lend the Software or
+      any portion of it, in source or binary form;
+   b) publish or publicly disclose the source code of the Software;
+   c) remove or alter any copyright, trademark, or proprietary notices;
+   d) reverse engineer or decompile the distributed binary bundles, except to
+      the extent such restriction is prohibited by applicable law;
+   e) use the Software to develop a directly competing commercial product.
+
+3. OWNERSHIP
+   The Software is licensed, not sold. The Licensor retains all right, title,
+   and interest in and to the Software, including all intellectual property
+   rights. Third-party components bundled with the Software remain under
+   their own licenses (see the "Third-Party Assets" section of the README).
+
+4. PRIVACY
+   The Software runs locally on your machine. It contains no telemetry and no
+   analytics. API keys and personal data you enter are stored only on your
+   machine, as described in the README ("Your Data" section).
+
+5. UPDATES AND SUPPORT
+   License holders are entitled to updates released within the purchased major
+   version. Support is provided on a reasonable-efforts basis through the
+   Licensor's public channels.
+
+6. TERMINATION
+   This license terminates automatically upon breach of any term. Upon
+   termination you must uninstall and destroy all copies of the Software.
+
+7. DISCLAIMER OF WARRANTIES
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+8. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY OR CONSEQUENTIAL DAMAGES (INCLUDING PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE,
+   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+9. GOVERNING LAW
+   This Agreement is governed by the laws of the Licensor's jurisdiction of
+   residence, excluding conflict-of-law rules.
+
+For licensing inquiries: Michel Buki — michelbuki2003@gmail.com

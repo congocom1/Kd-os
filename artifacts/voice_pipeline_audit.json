@@ -1,0 +1,132 @@
+{
+  "audit": "voice_pipeline",
+  "generated_at": "2026-11-16T00:00:00+00:00",
+  "scope": [
+    "core/wake_word.py",
+    "core/stt.py",
+    "core/tts.py",
+    "providers/stt_whisper.py",
+    "providers/tts_piper.py",
+    "providers/engine_pipeline.py",
+    "providers/rag.py",
+    "core/multi_person_voice.py",
+    "core/action_loader.py"
+  ],
+  "environment": {
+    "openwakeword": true,
+    "faster_whisper": true,
+    "piper": true,
+    "sounddevice": true,
+    "onnxruntime": true,
+    "onnxruntime_gpu": false,
+    "torch": true,
+    "pynvml": true,
+    "pyannote": false,
+    "speechbrain": false
+  },
+  "pipeline_stages": [
+    {
+      "stage": "wake_word",
+      "implemented": true,
+      "file": "core/wake_word.py",
+      "line": 1,
+      "notes": "openwakeword-based 'Hey Jarvis' detector, 1.5s cooldown, background thread, model download on demand. is_installed()/is_ready()/install_and_download() present."
+    },
+    {
+      "stage": "vad",
+      "implemented": true,
+      "file": "core/stt.py",
+      "line": 64,
+      "notes": "WhisperSTT.transcribe() uses faster-whisper vad_filter=True with min_silence_duration_ms=300. No standalone VAD component; VAD is embedded in Whisper."
+    },
+    {
+      "stage": "streaming_transcription",
+      "implemented": true,
+      "file": "core/stt.py",
+      "line": 55,
+      "notes": "WhisperSTT.transcribe() returns full transcript (blocking, not streaming). VoskSTT.process_chunk() supports streaming chunks but is not wired into a microphone loop."
+    },
+    {
+      "stage": "speaker_identification",
+      "implemented": true,
+      "file": "core/multi_person_voice.py",
+      "line": 35,
+      "notes": "SpectralSpeakerEmbedder (dependency-free fallback) + MultiPersonVoiceProcessor with enroll_speaker/identify_speaker. speechbrain ECAPA-TDNN optional (not installed)."
+    },
+    {
+      "stage": "intent_and_context",
+      "implemented": true,
+      "file": "providers/engine_pipeline.py",
+      "line": 106,
+      "notes": "PipelineEngine orchestrates STT → LLM → TTS via provider router. Tool calling via providers/schema.py."
+    },
+    {
+      "stage": "response_or_action",
+      "implemented": true,
+      "file": "providers/engine_pipeline.py",
+      "line": 245,
+      "notes": "send_realtime_input / send_cli paths exist. Action dispatch via core/action_loader.py TOOL dicts (50+ actions)."
+    },
+    {
+      "stage": "streaming_speech",
+      "implemented": true,
+      "file": "core/tts.py",
+      "line": 383,
+      "notes": "TTSPlayer with KokoroTTSEngine (offline neural), EdgeTTSEngine (internet), ElevenLabsTTSEngine (cloud). speak() is blocking; designed for dedicated thread."
+    },
+    {
+      "stage": "interruption",
+      "implemented": false,
+      "file": "core/tts.py",
+      "line": 419,
+      "notes": "TTSPlayer.stop() calls sd.stop() but no VAD-based barge-in / interruption-during-speech logic exists."
+    },
+    {
+      "stage": "text_fallback",
+      "implemented": false,
+      "file": "N/A",
+      "line": null,
+      "notes": "No explicit text-input fallback path when microphone is unavailable or user prefers typing."
+    },
+    {
+      "stage": "pipeline_orchestrator",
+      "implemented": false,
+      "file": "N/A",
+      "line": null,
+      "notes": "No single component wires wake→VAD→STT→speaker→LLM→TTS→interruption together end-to-end. Each stage exists independently but is not composed into one pipeline."
+    }
+  ],
+  "missing_dependencies": [
+    "pyannote.audio (speaker diarization)",
+    "speechbrain (ECAPA-TDNN speaker embeddings)",
+    "onnxruntime-gpu (GPU TTS acceleration)"
+  ],
+  "stubs_found": [
+    {
+      "function": "interruption / barge-in",
+      "file": "core/tts.py",
+      "line": 419,
+      "note": "TTSPlayer.stop() exists but no interruption detection."
+    },
+    {
+      "function": "streaming transcription (segment-by-segment)",
+      "file": "core/stt.py",
+      "line": 55,
+      "note": "WhisperSTT.transcribe() blocks until full utterance; VoskSTT.process_chunk() exists but unwired."
+    }
+  ],
+  "local_model_readiness": {
+    "ollama_reachable": true,
+    "models_installed": 15,
+    "qwen3_5_4b_present": true,
+    "default_stt_model": "base (faster-whisper, CPU, int8)",
+    "default_tts_engine": "kokoro (offline neural, ~330MB)"
+  },
+  "recommended_next_steps": [
+    "Compose pipeline_orchestrator that chains wake_word → stt_whisper → multi_person_voice → engine_pipeline → tts.",
+    "Add interruption detection (VAD during TTS playback) using sd.stop() + wake-word re-arm.",
+    "Add text fallback input path for when mic is unavailable.",
+    "Confirm pyannote/speechbrain optional path degrades gracefully to SpectralSpeakerEmbedder (already implemented)."
+  ],
+  "verdict": "All pipeline stages exist individually; only interruption, text fallback, and end-to-end orchestration are missing. Local dependencies (openwakeword, faster-whisper, piper, sounddevice) are all installed."
+}

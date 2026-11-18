@@ -1,0 +1,50 @@
+{
+  "source": "/home/hermes/.cline/worktrees/ec023/Mark-LVI-main",
+  "generated_at": "2026-11-16T00:27:00+00:00",
+  "repository": "KD release engineering release checklist",
+  "file_checksums": {
+    "core/camera.py": "0cd636567520438004dd60ac717804018945dc67b6f5a2c2dbb0111a157c3d98",
+    "actions/screen_processor.py": "e0e0a23f4035c20f6b95ab3acdc7ac7895d6ac299046bbb6e03980f63f58d80b",
+    "core/gesture_3d.py": "b1fdf4cc484db47076bfe909122231f17148e9bb1722f2976bd79b33471fd61c",
+    "ui.py": "bc4e388a30e504517a54a34e58278d3b4186dbf0c8a6b5ee61fed874a3f4241b",
+    "dashboard/server.py": "a170726d44d0ff121a52087e66a268bce787e35ac003f85c14d513533306b737",
+    "core/dependency_audit.py": "c6e4279584705848a9af4f3a1db17b979cb45c445ad8fd3ade9d4e13d37a9e23",
+    "actions/dependency_audit.py": "fbb30959a48618028fd38f46df05381ab2c22261ce9f49d551c114b836f6b772",
+    "core/vendor/dependency_doctor/implementation.py": "86a2829e68b20f6fc25858e44600c55995594851faacfc1e5e17f746f7063e7d",
+    "kd": "f58c67271673f79f73eebc81ed5b113edf9c6aefbe660f7db7a06ebc98070f2d",
+    "tests/test_camera_leases.py": "5818ac813f51eaf35dc1eed77c84a1dbe8e13e38820e8c975978f5f88515c864",
+    "tests/test_camera_capture.py": "6687e80a00bd672ddb12394f178e4fd5f808f556221e30fc970665331a0a1730",
+    "tests/test_gesture_3d.py": "c417880b408a7cb3d69e7a222b4568378f66520f79d7acc60977fd5c97fd6d45",
+    "tests/test_dashboard_protocol.py": "5cf30b5e10840c47e7fb621683cba61578e3336b878f7f2250d61121f06fe31f",
+    "tests/test_dashboard_ports.py": "a856994af6764646d8bdf1f85d14793713de52ee3d8670fd4a628f79b80cf3b3",
+    "tests/test_dashboard_boundaries.py": "8b1823bdf170192ca07f5fa70200037132104020de6f4eaf321f92e248c44645",
+    "tests/test_dependency_audit.py": "cd8bdc91ae826090d0f64a36b5ecd9a1b0f72b9a4828d71fa625cc99b1f75fe6",
+    "frontend/package.json": "6b9819aeefb143a0dfbbe1bf9082859b5169dfd36969eb10246ebe8af2d51039",
+    "frontend/src/protocol.test.js": "61fd6492ee85db30289497b61390d3979a90e0d74e1a084cdce4563e109912c5"
+  },
+  "command_evidence": {
+    "frontend_ci": {"status": "passed", "output": "see /tmp/frontend_ci_final.log"},
+    "frontend_test": {"status": "passed", "output": "see /tmp/frontend_test_final.log"},
+    "frontend_build": {"status": "passed", "output": "see /tmp/frontend_build_final.log"},
+    "backend_focused_tests": {"status": "passed", "output": "see docs/evidence/kd-hardening/focused-final.log"},
+    "dependency_doctor": {"status": "passed", "output": "see /tmp/deps_requirements_final.json, /tmp/deps_frontend_final.json, /tmp/deps_python_final.json"},
+    "python_package_compiles": {"status": "passed"},
+    "bash_launcher_syntax": {"status": "passed"}
+  },
+  "remaining_product_gates": [
+    "Offline microphone -> VAD -> transcript -> local response -> spoken audio pipeline",
+    "French/English voice selection and push-to-talk",
+    "Microphone mute and interruption state",
+    "Speaker enrollment and verification (enrolled, unknown, uncertain)",
+    "Durable conversation history, deletion and export",
+    "Hybrid local/keyword unified search with source citations",
+    "Low VRAM GPU scheduling with queueing and cancellation",
+    "Timezone-aware workflow scheduler with audit records",
+    "Connector credential management and approval-bound external sends",
+    "Command-center dashboard, GPU telemetry and active-window inspection",
+    "Health/readiness endpoints and systemd user service packaging",
+    "Lint, type checks, full test suite, and dependency pinning"
+  ],
+  "production_readiness": false,
+  "production_readiness_basis": "No full production smoke, no physical mic/camera, no red-team verification, and Git metadata cannot be verified because the primary checkout is missing."
+}

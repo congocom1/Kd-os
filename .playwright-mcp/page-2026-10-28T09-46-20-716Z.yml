@@ -1,0 +1,20 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - emphasis [ref=e5]: J
+    - text: ARVIS
+  - generic [ref=e6]: Remote Access
+  - generic [ref=e7]: by Michel Buki
+  - paragraph [ref=e8]:
+    - text: Press
+    - strong [ref=e9]: Remote Control
+    - text: in the JARVIS desktop app to get a QR code or session key.
+  - textbox "· · · · · ·" [active] [ref=e11]
+  - button "CONNECT" [ref=e13] [cursor=pointer]
+  - paragraph [ref=e14]:
+    - text: 🎤
+    - strong [ref=e15]: "Voice commands:"
+    - text: open
+    - code [ref=e16]: chrome://flags
+    - text: on your phone, search
+    - code [ref=e17]: Insecure origins treated as secure
+    - text: ", add your JARVIS URL, tap Relaunch."

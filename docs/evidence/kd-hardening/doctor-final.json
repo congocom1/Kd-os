@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "observed_at": "2026-11-16T04:52:08.699697+00:00",
+  "system": {
+    "os": "Linux",
+    "release": "7.0.0-43-generic",
+    "python": "3.14.9",
+    "cpu_count": 16,
+    "ram_bytes": 32797831168
+  },
+  "tools_on_path": {
+    "ollama": true,
+    "docker": true,
+    "nvcc": false,
+    "gnat": false,
+    "gnatprove": false,
+    "sbcl": false,
+    "gcc": true,
+    "g++": true,
+    "cmake": true,
+    "node": true,
+    "npm": true
+  },
+  "packages": {
+    "fastapi": "0.162.0",
+    "PyQt6": "6.11.0",
+    "faster-whisper": "1.2.1",
+    "piper-tts": "1.8.0",
+    "sounddevice": "0.5.6",
+    "onnxruntime": "1.31.0",
+    "onnxruntime-gpu": null,
+    "torch": "2.14.1"
+  },
+  "gpu": {
+    "status": "detected",
+    "devices": [
+      {
+        "name": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "memory_mib": 8151,
+        "driver": "595.99.02"
+      }
+    ],
+    "inference": "not_tested"
+  },
+  "ollama": {
+    "status": "reachable",
+    "models": [
+      "deepseek-r1:8b",
+      "embeddinggemma:latest",
+      "gemma3:4b",
+      "granite4:3b",
+      "hf.co/bartowski/Qwen_Qwen3-4B-GGUF:Q6_K",
+      "qwen2.5-coder:7b",
+      "qwen3-embedding:0.6b",
+      "qwen3-vl:4b",
+      "qwen3.5:0.8b",
+      "qwen3.5:27b",
+      "qwen3.5:2b",
+      "qwen3.5:35b",
+      "qwen3.5:4b",
+      "qwen3.5:9b",
+      "qwen3:4b"
+    ],
+    "inference": "not_tested"
+  },
+  "not_tested": [
+    "microphone_capture",
+    "speech_recognition",
+    "speech_synthesis",
+    "gpu_inference",
+    "docker_daemon",
+    "authorization_coverage",
+    "backup_restore",
+    "gui_rendering"
+  ]
+}

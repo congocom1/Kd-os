@@ -1,0 +1,115 @@
+{
+  "audit": "frontend_command_center",
+  "generated_at": "2026-11-16T00:00:00+00:00",
+  "scope": [
+    "frontend/src/*.js",
+    "frontend/public/*.html",
+    "dashboard/static/*.html",
+    "dashboard/server.py"
+  ],
+  "screens": [
+    {
+      "name": "voice_assistant",
+      "file": "frontend/src/dashboard.js",
+      "exists": true,
+      "state": "implemented",
+      "notes": "micBtn, stopBtn, cmdInput, sendBtn dock elements present; modeBtns for navigation."
+    },
+    {
+      "name": "conversation_history",
+      "file": "frontend/src/dashboard.js",
+      "exists": true,
+      "state": "implemented",
+      "notes": "detailPanel, detailTitle, detailContent, closeBtn present for history view."
+    },
+    {
+      "name": "command_palette",
+      "file": "frontend/src/dashboard.js",
+      "exists": true,
+      "state": "implemented",
+      "notes": "cmdInput + sendBtn in dock; commandBody() in protocol.js builds {text} payload."
+    },
+    {
+      "name": "unified_search",
+      "file": "frontend/src/dashboard.js",
+      "exists": false,
+      "state": "missing",
+      "notes": "No unified search UI element found; search actions exist backend-side only."
+    },
+    {
+      "name": "command_center",
+      "file": "frontend/src/dashboard.js",
+      "exists": true,
+      "state": "implemented",
+      "notes": "GPU/RAM/VRAM/CPU telemetry display elements present (cpuVal, gpuVal, vramVal, ramVal, etc.)."
+    },
+    {
+      "name": "workflows_approvals",
+      "file": "frontend/src/dashboard.js",
+      "exists": false,
+      "state": "missing",
+      "notes": "No workflow scheduler or approvals UI found."
+    },
+    {
+      "name": "security_events",
+      "file": "frontend/src/dashboard.js",
+      "exists": false,
+      "state": "missing",
+      "notes": "No security events panel found."
+    },
+    {
+      "name": "settings",
+      "file": "frontend/src/dashboard.js",
+      "exists": false,
+      "state": "missing",
+      "notes": "No settings UI found."
+    },
+    {
+      "name": "diagnostics",
+      "file": "frontend/src/dashboard.js",
+      "exists": false,
+      "state": "missing",
+      "notes": "No diagnostics UI found; backend core/diagnostics.py exists but not consumed by frontend."
+    }
+  ],
+  "voice_states": {
+    "listening": false,
+    "transcribing": false,
+    "thinking": false,
+    "speaking": false,
+    "muted": false,
+    "error": false,
+    "notes": "micBtn/stopBtn exist but no state machine wiring to listening/transcribing/thinking/speaking/muted/error states found in dashboard.js."
+  },
+  "mic_indicator": {
+    "exists": false,
+    "notes": "micBtn element present but no visible microphone indicator with live level meter found."
+  },
+  "mute_control": {
+    "exists": true,
+    "notes": "stopBtn present in dock; mute behavior not verified."
+  },
+  "telemetry_wired": {
+    "consumes_api_telemetry": false,
+    "consumes_ws_telemetry": false,
+    "notes": "dashboard.js has telemetryInterval: 2000 config but no fetch/ws calls to /api/telemetry or /ws/telemetry found. Backend endpoints exist (added) but frontend not wired."
+  },
+  "keyboard_nav": {
+    "exists": false,
+    "notes": "No keyboard navigation, focus states, or ARIA handling found in frontend/src/*.js."
+  },
+  "realtime": {
+    "websocket_connection_state": false,
+    "reconnect": false,
+    "live_status_feedback": false,
+    "notes": "No WebSocket connection state management or reconnect logic found."
+  },
+  "recommended_next_steps": [
+    "Wire frontend dashboard.js to /api/telemetry (poll) or /ws/telemetry (stream) for live CPU/RAM/GPU.",
+    "Add voice state machine: listening/transcribing/thinking/speaking/muted/error with visible indicators.",
+    "Add unified search, workflows/approvals, security events, settings, diagnostics screens.",
+    "Add keyboard navigation and focus states.",
+    "Add WebSocket connection state + reconnect with live status feedback."
+  ],
+  "verdict": "Core shell exists (voice assistant, command palette, command center) but unified search, workflows, approvals, security events, settings, diagnostics are missing. Telemetry endpoints exist but are not consumed by frontend. No voice state machine, no keyboard nav, no realtime WS state."
+}

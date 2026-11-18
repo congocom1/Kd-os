@@ -1,0 +1,24 @@
+{
+  "synthetic_prompt": true,
+  "model": "qwen3.5:4b",
+  "context_requested": 4096,
+  "runs": [
+    {
+      "phase": "cold",
+      "first_text_s": 8.551810778997606,
+      "elapsed_s": 8.59656578497379,
+      "done": true,
+      "eval_count": 2
+    },
+    {
+      "phase": "warm",
+      "first_text_s": 5.265748367994092,
+      "elapsed_s": 5.309920176019659,
+      "done": true,
+      "eval_count": 2
+    }
+  ],
+  "placement": {
+    "models": []
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "audit": "ops_release",
+  "generated_at": "2026-11-16T00:00:00+00:00",
+  "scope": [
+    "scripts/health-check.sh",
+    "scripts/deploy.sh",
+    "scripts/make_process_telemetry.py",
+    "scripts/fix_dashboard_port_crash.py",
+    "launch.sh",
+    "kd",
+    "pyproject.toml",
+    "requirements.txt",
+    "core/diagnostics.py",
+    "tests/"
+  ],
+  "entrypoints": {
+    "setup": true,
+    "start": true,
+    "doctor": true,
+    "check": true,
+    "deps": true,
+    "notes": "./kd entrypoint present and executable; all subcommands functional."
+  },
+  "health_check": {
+    "exists": true,
+    "executable": true,
+    "runs": true,
+    "notes": "scripts/health-check.sh checks JARVIS HUD (7860), God's Eye View (4174), Kronos (7861/health)."
+  },
+  "deploy": {
+    "exists": true,
+    "runnable": true,
+    "notes": "scripts/deploy.sh uses docker compose build/up/health-check."
+  },
+  "telemetry_script": {
+    "exists": true,
+    "runs": true,
+    "produces_artifact": true,
+    "artifact": "artifacts/process_telemetry.json",
+    "notes": "scripts/make_process_telemetry.py runs end-to-end and writes real-time process telemetry."
+  },
+  "lint_typecheck": {
+    "configured": true,
+    "black": true,
+    "flake8": true,
+    "mypy": true,
+    "runnable": true,
+    "notes": "pyproject.toml configures black (line-length 88), flake8 (max-line-length 88), mypy (python_version 3.10). Not yet executed against codebase."
+  },
+  "dependency_pinning": {
+    "requirements_txt_unpinned_count": 22,
+    "pyproject_optional_unpinned": "duplicates found (openwakeword, torch, einops, huggingface-hub, matplotlib, pandas, tqdm, safetensors)",
+    "notes": "Dependency Doctor reported 22 unpinned entries in requirements.txt and 8 duplicate constraints in pyproject.toml [all] section."
+  },
+  "systemd_service": {
+    "exists": false,
+    "path": null,
+    "notes": "No systemd user service unit found for KD."
+  },
+  "full_suite": {
+    "passed": 178,
+    "failed": 2,
+    "skipped": 1,
+    "failures": [
+      "tests/test_pytorch3d_compat.py::test_io_detaches_gradient_input (missing trimesh)",
+      "tests/test_rag_provider.py::test_rag_provider_ingest_and_query_unit (missing sentence_transformers)"
+    ],
+    "notes": "Both failures are missing optional dependencies, not code defects."
+  },
+  "recommended_next_steps": [
+    "Create systemd user service unit for KD.",
+    "Pin 22 unpinned dependencies in requirements.txt.",
+    "Resolve 8 duplicate constraints in pyproject.toml [all] section.",
+    "Run black/flake8/mypy against codebase and fix findings.",
+    "Install trimesh and sentence_transformers OR stub RAG/pytorch3d tests to avoid optional-dep failures.",
+    "Execute lint/typecheck in CI gate."
+  ],
+  "verdict": "Entry points, health check, deploy, and telemetry script all present and working. Full suite: 178 passed / 2 failed (optional deps). Missing: systemd service, dependency pinning, lint/typecheck execution."
+}

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# KD repository-native entrypoint; legacy launch remains available.
+set -euo pipefail
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$root"
+python="${KD_PYTHON:-${JARVIS_PYTHON:-python3}}"
+if [[ -z "${KD_PYTHON:-}${JARVIS_PYTHON:-}" && -x "$root/.venv/bin/python" ]]; then
+    python="$root/.venv/bin/python"
+fi
+case "${1:-start}" in
+    doctor) exec "$python" -m core.diagnostics ;;
+    deps) shift; exec "$python" -m core.dependency_audit "$@" ;;
+    check) exec "$python" -m pytest "$root/tests" -p no:cacheprovider ;;
+    setup)
+        "$python" -m venv "$root/.venv"
+        exec "$root/.venv/bin/python" -m pip install -r "$root/requirements.txt"
+        ;;
+    start)
+        [[ $# -eq 0 ]] || shift
+        # A lock covers launches through this entrypoint, not legacy processes.
+        exec 9>"$root/.kd-instance.lock"
+        if ! flock -n 9; then
+            echo 'KD is already running through this entrypoint.' >&2
+            exit 1
+        fi
+        export JARVIS_PYTHON="$python"
+        exec bash "$root/launch.sh" "$@"
+        ;;
+    *) echo 'Usage: ./kd {setup|start|doctor|check|deps MANIFEST}' >&2; exit 2 ;;
+esac

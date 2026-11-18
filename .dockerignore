@@ -1,0 +1,44 @@
+# ── Mark-LVI monorepo Docker ignore rules ───────────────────────────────────
+# Keep the JARVIS Docker image small by excluding the other app runtimes and
+# local build artifacts. The docker-compose.yml mounts data/, config/, and
+# memory/ as volumes, so their contents do not need to be in the image.
+
+# Virtual environments
+.venv/
+**/venv/
+**/.venv/
+
+# Node.js dependencies and runtime caches
+node_modules/
+**/node_modules/
+apps/*/.jarvis-runtime/
+
+# App build outputs
+apps/*/dist/
+apps/*/build/
+
+# Runtime data (mounted as volumes)
+data/cache/*
+!data/cache/.gitkeep
+data/logs/*
+!data/logs/.gitkeep
+data/shared/*
+!data/shared/.gitkeep
+data/images/*
+
+# Git and IDE
+.git/
+.vscode/
+.idea/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.so
+
+# Logs and test outputs
+*.log
+logs/
+downloads/
+screenshots/

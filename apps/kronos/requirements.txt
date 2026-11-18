@@ -1,0 +1,16 @@
+# ── Kronos financial model dependencies ──────────────────────────────────────
+# Core scientific stack. The original repo pinned pandas==2.2.2 and
+# matplotlib==3.9.3, but those do not build cleanly on Python 3.14. The
+# versions below are the minimums; newer releases are allowed so wheels are
+# used on modern interpreters.
+
+numpy>=1.24
+pandas>=2.2.2
+torch>=2.0.0
+
+# Kronos-specific packages (mostly pure-Python or widely wheeled)
+einops==0.8.1
+huggingface_hub==0.33.1
+matplotlib>=3.9.3
+tqdm==4.67.1
+safetensors==0.6.2

@@ -1,0 +1,21 @@
+# Local deployment override; use with the original running Compose project.
+services:
+  jarvis:
+    ports: !override
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8001"
+      - "10.0.0.10:8000:8000"
+      - "10.0.0.10:8001:8001"
+    environment:
+      KD_BIND_HOST: "0.0.0.0"
+      KD_ALLOW_LAN: "1"
+      KD_ADVERTISE_HOST: "10.0.0.10"
+    volumes:
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/config:/app/config:rw"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/main.py:/app/main.py:ro"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/ui.py:/app/ui.py:ro"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/core:/app/core:ro"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/actions:/app/actions:ro"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/plugins:/app/plugins:ro"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/dashboard/server.py:/app/dashboard/server.py:ro"
+      - "/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/dashboard/static:/app/dashboard/static:ro"

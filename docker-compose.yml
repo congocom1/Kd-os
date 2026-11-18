@@ -1,0 +1,108 @@
+services:
+  gods-eye-view:
+    build:
+      context: ./apps/gods-eye-view
+      dockerfile: Dockerfile
+    image: mark-lvi/gods-eye-view:latest
+    container_name: mark-lvi-gev
+    restart: unless-stopped
+    ports:
+      - "4174:4174"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4174/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - mark-lvi
+
+  kronos:
+    build:
+      context: ./apps/kronos
+      dockerfile: Dockerfile
+    image: mark-lvi/kronos:latest
+    container_name: mark-lvi-kronos
+    restart: unless-stopped
+    ports:
+      - "7861:7861"
+    environment:
+      - KRONOS_MODEL=NeoQuasar/Kronos-small
+      - KRONOS_TOKENIZER=NeoQuasar/Kronos-Tokenizer-base
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:7861/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - ./data:/app/data:rw
+    networks:
+      - mark-lvi
+
+  jarvis-speech:
+    image: nvcr.io/nvidia/jarvis/jarvis-speech:1.3.0-beta-server
+    container_name: mark-lvi-jarvis-speech
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    networks:
+      - mark-lvi
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    # Note: Jarvis Speech Skills API port may vary by tag. Verify with the NGC Release Notes for the chosen tag
+    # and update ports/healthcheck accordingly. Pull requires NGC authentication.
+
+  jarvis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mark-lvi/jarvis:latest
+    container_name: mark-lvi-jarvis
+    restart: unless-stopped
+    depends_on:
+      gods-eye-view:
+        condition: service_healthy
+      kronos:
+        condition: service_healthy
+      jarvis-speech:
+        condition: service_healthy
+    ports:
+      - "7860:7860"
+      - "8000:8000"
+      - "8001:8001"
+    environment:
+      - DISPLAY=:99
+      - QT_QPA_PLATFORM=offscreen
+      - JARVIS_GLOBE_URL=http://gods-eye-view:4174
+      - JARVIS_KRONOS_URL=http://kronos:7861
+      - JARVIS_SPEECH_URL=http://jarvis-speech:5000
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - VISUAL_DISPLAY_ENABLED=true
+      - STUDIO_3D_REVIEW_ENABLED=true
+    volumes:
+      - ./config:/app/config:rw
+      - ./memory:/app/memory:rw
+      - ./data:/app/data:rw
+    networks:
+      - mark-lvi
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7860/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    stop_grace_period: 30s
+
+networks:
+  mark-lvi:
+    driver: bridge

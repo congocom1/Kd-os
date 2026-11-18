@@ -1,0 +1,75 @@
+# ── MARK LVI — what never belongs in the repository ──────────────────────────
+# Everything listed here is created by the app on first run. A fresh clone with
+# none of it present boots straight to the setup screen, which is the intended
+# first experience — so nothing here needs to be committed, and some of it must
+# never be.
+
+# ── Secrets. Committing any of these publishes them. ──────────────────────────
+# NOTE: gitignore does not support trailing comments — each pattern stands alone.
+config/api_keys.json
+config/certs/
+config/whatsapp_web/
+**/token*.json
+**/client_secret*.json
+*credentials*.json
+.env
+.env.*
+
+# ── Personal data the assistant accumulates about you ─────────────────────────
+memory/long_term.json
+memory/*.db
+memory/enhanced/
+memory/tasks/
+memory/speakers/
+config/kd_features.json
+
+# ── Python build noise ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Editors and operating systems ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Runtime output ────────────────────────────────────────────────────────────
+*.log
+logs/
+downloads/
+screenshots/
+
+# ── Shared data workspace (keep structure, ignore runtime contents) ───────────
+/data/cache/*
+!/data/cache/.gitkeep
+/data/logs/*
+!/data/logs/.gitkeep
+/data/shared/*
+!/data/shared/.gitkeep
+
+# ── Monorepo app build artifacts and dependencies ─────────────────────────────
+/apps/*/node_modules/
+/apps/*/.jarvis-runtime/
+/apps/*/dist/
+/apps/*/.venv/
+/apps/*/build/
+/apps/*/__pycache__/
+
+# ── Installer & release output (the .spec file itself stays tracked) ─────────
+/installer/build/
+/installer/dist/
+/release/

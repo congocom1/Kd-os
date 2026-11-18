@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "run": "autoplan-mark-lvi-20261026-134124",
+  "gate_rev": 1,
+  "items": [
+    {
+      "id": "plan1",
+      "title": "Approve /autoplan review of GLOBE_INTEGRATION.md and proceed with surfaced fixes?",
+      "kind": "approval",
+      "recommended": "a",
+      "options": [
+        {"key": "a", "text": "Approve — implement the critical/high fixes from CEO, DX, and Eng reviews"},
+        {"key": "b", "text": "With overrides — tell me which findings to skip"},
+        {"key": "c", "text": "Revise the plan first"},
+        {"key": "d", "text": "Reject — do nothing"}
+      ]
+    }
+  ]
+}

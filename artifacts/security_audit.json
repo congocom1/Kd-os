@@ -1,0 +1,63 @@
+{
+  "audit": "security_hardening",
+  "generated_at": "2026-11-16T00:00:00+00:00",
+  "scope": [
+    "core/multi_person_voice.py",
+    "core/persistent_memory.py",
+    "dashboard/server.py",
+    "providers/llm_router.py",
+    "core/action_loader.py",
+    "tests/"
+  ],
+  "speaker_enrollment": {
+    "exists": true,
+    "file": "core/multi_person_voice.py",
+    "line": 350,
+    "enrolled_unknown_uncertain": true,
+    "file_line": "core/multi_person_voice.py lines 350-400",
+    "re_enroll": true,
+    "file_line": "core/multi_person_voice.py enroll_speaker() overwrites existing profile",
+    "delete": true,
+    "file_line": "core/multi_person_voice.py delete_speaker() removes profile file",
+    "embeddings_encrypted_at_rest": false,
+    "notes": "Speaker profiles saved as JSON (profile.to_dict()) to disk via _save_profile(). Embeddings stored as plain lists in JSON — no encryption at rest.",
+    "raw_audio_retention_off_by_default": true,
+    "notes": "No raw audio recording or retention code found; only embeddings (38-dim spectral descriptors) are stored."
+  },
+  "voice_authorization_boundary": {
+    "voice_match_can_authorize_sensitive_actions": false,
+    "notes": "No code found linking speaker identity to action authorization. Speaker ID is published to awareness engine (VOICE_SPEAKER_CHANGED) but not used to gate actions."
+  },
+  "memory_deletion_cascade": {
+    "deletion_removes_embeddings": true,
+    "file_line": "core/persistent_memory.py delete_entry() removes from _entries and vector store",
+    "notes": "EnhancedMemoryEngine.delete_entry() removes entry from _entries and calls _vector_store.delete(). export_for_backup/import_from_backup also handle embeddings."
+  },
+  "dashboard_network": {
+    "loopback_only_default": true,
+    "file_line": "dashboard/server.py _bind_host() line 61-65 defaults to 127.0.0.1",
+    "lan_requires_opt_in": true,
+    "file_line": "dashboard/server.py _bind_host() line 63-64 requires KD_ALLOW_LAN=1 for non-loopback",
+    "origin_checks_all_ws": true,
+    "file_line": "dashboard/server.py _origin_allowed() line 68-77 applied to /ws, /ws/telemetry, /ws/gestures, /ws/phone-audio",
+    "notes": "Dashboard binds loopback by default; LAN requires explicit env flag; all three WebSocket endpoints check origin."
+  },
+  "cloud_consent": {
+    "cloud_opt_in_by_data_category": false,
+    "notes": "providers/llm_router.py routes to Ollama (local) by default. No per-data-category cloud consent enforcement found. OpenRouter not integrated."
+  },
+  "keys_in_keyring": false,
+  "notes": "No OS keyring or protected service credentials integration found. API keys stored in config/api_keys.json as plain JSON.",
+  "keys_never_logged": true,
+  "notes": "core/diagnostics.py explicitly avoids echoing exception strings/response bodies. providers/llm_router.py marks api_key as kind='secret'.",
+  "action_permissions": false,
+  "notes": "core/action_loader.py dispatches actions via TOOL dicts. No required-permissions field, no enforcement, no pre-execution confirmation.",
+  "recommended_next_steps": [
+    "Encrypt speaker embeddings at rest (e.g., Fernet/OS keyring).",
+    "Add voice authorization boundary: voice match personalizes but cannot authorize sensitive actions.",
+    "Add per-data-category cloud consent enforcement; migrate API keys to OS keyring.",
+    "Add action permission enforcement with required-permissions metadata and pre-execution confirmation.",
+    "Add full audit log for authorization decisions and observed results."
+  ],
+  "verdict": "Speaker enrollment, memory deletion cascade, dashboard network boundaries, and key-not-logged are implemented. Missing: encrypted embeddings at rest, voice authorization boundary, cloud consent by data category, keyring integration, action permission enforcement."
+}

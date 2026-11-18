@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarvis"
+version = "1.0.0"
+description = "Mark-LVI monorepo — JARVIS AI assistant with voice wake-word, screen vision, 3D studio modeling, social media integration, cybersecurity tools, and cinematic HUD. Includes God's Eye View geospatial console and Kronos financial model workspaces."
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+authors = [
+    { name = "Michel Buki", email = "michelbuki2003@gmail.com" },
+]
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
+keywords = [
+    "ai-assistant",
+    "jarvis",
+    "voice-assistant",
+    "3d-modeling",
+    "cybersecurity",
+    "computer-vision",
+    "wake-word",
+    "plugin-system",
+]
+
+[project.optional-dependencies]
+wake = ["openwakeword>=1.2,<2"]
+kronos = [
+    "torch>=2.0.0",
+    "einops==0.8.1",
+    "huggingface_hub==0.33.1",
+    "matplotlib>=3.9.3",
+    "pandas>=2.2.2",
+    "tqdm==4.67.1",
+    "safetensors==0.6.2",
+]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+]
+all = [
+    "openwakeword>=1.2,<2",
+    "torch>=2.0.0",
+    "einops==0.8.1",
+    "huggingface_hub==0.33.1",
+    "matplotlib>=3.9.3",
+    "pandas>=2.2.2",
+    "tqdm==4.67.1",
+    "safetensors==0.6.2",
+]
+
+[project.scripts]
+jarvis = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core*", "actions*", "plugins*", "providers*", "skills*", "memory*", "dashboard*"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.package-data]
+core = ["*.obj", "*.txt", "*.json"]
+# NOTE: config/api_keys.json (user secrets) must never be packaged — see MANIFEST.in.
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+max-complexity = 18
+select = ["C", "E", "F", "W", "B", "B950"]
+
+[tool.mypy]
+python_version = 3.10
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
