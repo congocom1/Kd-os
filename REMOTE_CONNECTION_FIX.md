@@ -26,7 +26,7 @@ The current deployment uses an offscreen Qt interface. Access to its pairing UI 
 
 The address is specific to this machine. Update both port bindings and KD_ADVERTISE_HOST if its Wi-Fi address changes. This override mounts the dashboard server file only; it does not deploy unrelated workspace changes into the older image.
 
-A private configuration backup is stored at `/home/hermes/.cline/worktrees/ec023/jarvis personnel assistant/config/api_keys.before-remote-fix.json` with mode 0600. It contains credentials and must not be committed or shared.
+Keep configuration backups outside the checkout in private storage (mode 0600 on Linux). The previously tracked `config/api_keys.before-remote-fix.json` has been removed from the working tree; this does not remove it from Git history. Rotate any credential present in that backup and avoid reusing it.
 
 ## Recovery completed
 

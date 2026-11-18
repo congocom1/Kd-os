@@ -36,11 +36,11 @@
     "runtime": "node",
     "exports": ["./build/vite", "./build/html"],
     "modules": [
-      "build/vite.js",
-      "build/application-html.js",
-      "build/allowedHosts.js",
-      "build/embed-framing.js",
-      "build/panel.js"
+      "build-tools/vite.js",
+      "build-tools/application-html.js",
+      "build-tools/allowedHosts.js",
+      "build-tools/embed-framing.js",
+      "build-tools/panel.js"
     ],
     "external": ["vite-plugin-cesium"]
   },

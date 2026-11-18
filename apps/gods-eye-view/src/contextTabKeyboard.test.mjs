@@ -1,4 +1,4 @@
-import { expandApplicationHtml } from '../build/application-html.js';
+import { expandApplicationHtml } from '../build-tools/application-html.js';
 import { readStylesheet } from './testSupport/readStylesheet.mjs';
 import { _selectContextMode } from './ui/contextTransactions.js';
 import { _syncContextModeButtons } from './ui/contextPresentation.js';

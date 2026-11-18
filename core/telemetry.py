@@ -108,10 +108,9 @@ def _probeNetwork() -> dict[str, Any]:
     """Return aggregate network I/O for the host."""
     io = psutil.net_io_counters(pernic=False)
     return {
-        "bytes_sent": io.bytes_sent,
-        "bytes_recv": io.bytes_recv,
-        "packets_sent": io.packets_sent,
-        "packets_recv": io.packets_recv,
+        "status": "ok" if io is not None else "unavailable",
+        **{name: getattr(io, name, None) for name in
+           ("bytes_sent", "bytes_recv", "packets_sent", "packets_recv")},
         "last_refresh": _now_iso(),
     }
 
@@ -141,20 +140,21 @@ def get_telemetry() -> dict[str, Any]:
     """Return a single real-time snapshot of host + KD process state."""
     global _PROCESS_SAMPLED
     proc = _PROCESS
-    with _PROCESS_LOCK:
+    with _PROCESS_LOCK, proc.oneshot():
         cpu = proc.cpu_percent()
         process_cpu = cpu if _PROCESS_SAMPLED else None
         _PROCESS_SAMPLED = True
-    proc_info = {
-        "pid": proc.pid,
-        "name": proc.name(),
-        "cpu_percent": process_cpu,
-        "memory_info": proc.memory_info()._asdict(),
-        "num_threads": proc.num_threads(),
-    }
+        proc_info = {
+            "pid": proc.pid,
+            "name": proc.name(),
+            "cpu_percent": process_cpu,
+            "memory_info": proc.memory_info()._asdict(),
+            "num_threads": proc.num_threads(),
+        }
 
     sys_cpu = psutil.cpu_percent(interval=0.1)
     sys_mem = psutil.virtual_memory()
+    swap = psutil.swap_memory()
     net = _probeNetwork()
     gpu = _probeGpu()
     disks = _probeDisks()
@@ -163,7 +163,7 @@ def get_telemetry() -> dict[str, Any]:
     return {
         "schema_version": "1.0",
         "timestamp": _now_iso(),
-        "status": "ok" if gpu["status"] == "ok" else "partial",
+        "status": "ok" if gpu["status"] == net["status"] == "ok" else "partial",
         "process": proc_info,
         "system": {
             "cpu_percent": sys_cpu,
@@ -171,9 +171,9 @@ def get_telemetry() -> dict[str, Any]:
             "memory_total_mb": round(sys_mem.total / (1024 * 1024), 1),
             "memory_available_mb": round(sys_mem.available / (1024 * 1024), 1),
             "memory_percent": sys_mem.percent,
-            "swap_total_mb": round(psutil.swap_memory().total / (1024 * 1024), 1),
-            "swap_used_mb": round(psutil.swap_memory().used / (1024 * 1024), 1),
-            "swap_percent": psutil.swap_memory().percent,
+            "swap_total_mb": round(swap.total / (1024 * 1024), 1),
+            "swap_used_mb": round(swap.used / (1024 * 1024), 1),
+            "swap_percent": swap.percent,
             "disks": disks,
             "disk_temp_c": disks_temp,
             "network": net,

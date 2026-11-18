@@ -7,7 +7,7 @@ import {
   hostCheckPlugin,
   isAllowedHost,
   resolveAllowedHosts,
-} from '../../build/allowedHosts.js';
+} from '../../build-tools/allowedHosts.js';
 
 test('uses the restricted local host allowlist by default', () => {
   assert.deepEqual(resolveAllowedHosts(), DEFAULT_ALLOWED_HOSTS);
@@ -96,7 +96,7 @@ test('the Host check is installed first on the dev and preview servers', () => {
 
 test('an unlisted Host cannot reach a route a plugin mounts', async (t) => {
   const { createServer } = await import('vite');
-  const { createBrowserViteConfig } = await import('../../build/vite.js');
+  const { createBrowserViteConfig } = await import('../../build-tools/vite.js');
   const provider = {
     name: 'fixture-provider',
     configureServer(server) {

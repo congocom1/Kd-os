@@ -293,7 +293,7 @@ class VectorStore:
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
             rows = conn.execute(
-                "SELECT id, text, source, metadata FROM chunks WHERE collection = ?",
+                "SELECT id, text, source, metadata FROM chunks WHERE collection = ? ORDER BY id",
                 (collection,)
             ).fetchall()
             return [Chunk(
@@ -337,15 +337,17 @@ class VectorStore:
             if path.exists():
                 path.unlink()
 
-    def get_stats(self, collection: str) -> dict:
+    def count_chunks(self, collection: str) -> int:
         with sqlite3.connect(self.db_path) as conn:
-            count = conn.execute(
+            return conn.execute(
                 "SELECT COUNT(*) FROM chunks WHERE collection = ?", (collection,)
             ).fetchone()[0]
+
+    def get_stats(self, collection: str) -> dict:
         vectors = self.load_vectors(collection)
         return {
             "collection": collection,
-            "chunk_count": count,
+            "chunk_count": self.count_chunks(collection),
             "vector_shape": vectors.shape if vectors is not None else None,
             "has_vectors": vectors is not None,
         }
@@ -496,35 +498,29 @@ class RAGProvider:
         if not chunk_texts:
             return {"status": "error", "message": "No text to ingest"}
 
-        # Create chunks
-        chunks = []
-        for i, ct in enumerate(chunk_texts):
-            chunk_meta = metadata or {}
-            chunk_meta.update({"chunk_index": i, "total_chunks": len(chunk_texts)})
-            chunks.append(Chunk(
-                id=0,  # Will be assigned by store
-                text=ct,
+        chunks = [
+            Chunk(
+                id=0,
+                text=chunk,
                 source=source,
                 collection=collection,
-                metadata=chunk_meta
-            ))
+                metadata={**(metadata or {}), "chunk_index": i, "total_chunks": len(chunk_texts)},
+            )
+            for i, chunk in enumerate(chunk_texts)
+        ]
 
-        # Embed chunks
-        texts = [c.text for c in chunks]
-        embeddings = self.embedder.embed(texts)
-        for chunk, emb in zip(chunks, embeddings):
-            chunk.embedding = emb
-
-        # Store
-        ids = self.store.add_chunks(collection, chunks)
-        for chunk, cid in zip(chunks, ids):
-            chunk.id = cid
-
-        # Save vectors
-        vectors = np.vstack([c.embedding for c in chunks])
+        # Validate the batch before inserting rows; an incompatible embedding
+        # model must not leave chunks without corresponding vectors.
+        vectors = np.asarray(self.embedder.embed(chunk_texts), dtype=np.float32)
+        if vectors.ndim != 2 or vectors.shape[0] != len(chunks) or not vectors.shape[1]:
+            return {"status": "error", "message": "Embedding provider returned an invalid batch."}
         existing = self.store.load_vectors(collection)
         if existing is not None:
-            vectors = np.vstack([existing, vectors])
+            if existing.ndim != 2 or existing.shape[1] != vectors.shape[1]:
+                return {"status": "error", "message": "Embedding dimensions do not match this collection."}
+            vectors = np.concatenate((existing, vectors))
+
+        self.store.add_chunks(collection, chunks)
         self.store.save_vectors(collection, vectors)
 
         return {
@@ -532,7 +528,7 @@ class RAGProvider:
             "collection": collection,
             "source": source,
             "chunks_added": len(chunks),
-            "total_chunks": len(self.store.get_chunks(collection)),
+            "total_chunks": self.store.count_chunks(collection),
         }
 
     def ingest_file(self, path: str, collection: str = "default") -> dict:

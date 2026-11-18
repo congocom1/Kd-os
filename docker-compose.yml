@@ -3,6 +3,7 @@ services:
     build:
       context: ./apps/gods-eye-view
       dockerfile: Dockerfile
+      target: production
     image: mark-lvi/gods-eye-view:latest
     container_name: mark-lvi-gev
     restart: unless-stopped

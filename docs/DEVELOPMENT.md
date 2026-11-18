@@ -90,9 +90,17 @@ def run(parameters: dict, player=None, session_memory=None) -> str:
 
 ## Running Tests
 
+On Debian or Ubuntu, Qt needs runtime libraries even in offscreen mode:
+
 ```bash
-pytest tests/
+sudo apt-get install libegl1 libgl1 libxkbcommon0 libdbus-1-3 libportaudio2
+./kd setup --dev
+./kd check
 ```
+
+Use `./kd check -k telemetry` to select a test group. Optional model and GPU
+packages are not needed for the standard test run. See the [root README](../README.md)
+for the two JavaScript lockfiles and build commands.
 
 ## Linting
 

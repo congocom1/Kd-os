@@ -1,10 +1,12 @@
 """Tests for RAG provider - unit tests only (no model downloads)."""
+import sys
 import tempfile
 from pathlib import Path
 
 import pytest
 import numpy as np
 
+from providers import rag
 from providers.rag import (
     VectorStore, Chunk, chunk_text_fixed, chunk_text_semantic,
     EmbeddingProvider, RetrievalEngine, Reranker, RAGProvider, RAGServiceClient,
@@ -21,10 +23,11 @@ def test_chunk_text_fixed():
         assert len(chunk) <= 250  # Some flexibility for sentence boundaries
 
 
-def test_chunk_text_semantic_fallback():
+def test_chunk_text_semantic_fallback(monkeypatch):
     """Test semantic chunking falls back to fixed when model unavailable."""
     text = "First sentence. Second sentence. Third sentence. " * 10
-    # This should work even without sentence-transformers (fallback)
+    # Do not load models even if the optional package is installed.
+    monkeypatch.setitem(sys.modules, "sentence_transformers", None)
     chunks = chunk_text_semantic(text, max_chunk_size=200)
     assert len(chunks) > 0
 
@@ -173,29 +176,52 @@ def test_rag_provider_init():
         assert provider.llm is not None
 
 
-def test_rag_provider_ingest_and_query_unit():
-    """Test RAGProvider ingest/query with mocked LLM."""
-    pytest.importorskip("sentence_transformers")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        provider = RAGProvider({"data_dir": tmpdir})
+@pytest.fixture
+def offline_provider(tmp_path, monkeypatch):
+    """Keep ingest/query tests independent of model servers and downloads."""
+    monkeypatch.setitem(sys.modules, "sentence_transformers", None)
+    provider = RAGProvider({"data_dir": str(tmp_path)})
+    monkeypatch.setattr(provider.embedder, "embed", lambda texts: np.ones((len(texts), 4)))
+    provider.retriever.reranker = None
+    return provider
 
-        # Mock the LLM to avoid model downloads
-        class MockLLM:
-            def complete(self, messages):
-                return "Mocked answer based on context", []
 
-        provider.llm = MockLLM()
+def test_rag_provider_ingest_and_query_unit(offline_provider, monkeypatch):
+    provider = offline_provider
+    monkeypatch.setattr(provider.llm, "complete", lambda _: ("Mocked answer", []))
+    result = provider.ingest("Python is a programming language.", "test.txt", "test")
+    assert result["status"] == "ok"
+    assert result["chunks_added"] == 1
 
-        # Ingest
-        result = provider.ingest("Python is a programming language.", "test.txt", "test")
-        assert result["status"] == "ok"
-        assert result["chunks_added"] > 0
+    response = provider.query("What is Python?", "test", top_k=2)
+    assert response.answer == "Mocked answer"
+    assert [source["source"] for source in response.sources] == ["test.txt"]
+    assert response.collection == "test"
 
-        # Query
-        response = provider.query("What is Python?", "test", top_k=2)
-        assert isinstance(response.answer, str)
-        assert len(response.sources) > 0
-        assert response.collection == "test"
+
+def test_ingest_copies_metadata_per_chunk(offline_provider, monkeypatch):
+    provider = offline_provider
+    monkeypatch.setattr(rag, "chunk_text_fixed", lambda text: ["first", "second"])
+    metadata = {"title": "Example"}
+    result = provider.ingest("first second", "doc", chunking="fixed", metadata=metadata)
+    assert result["total_chunks"] == 2
+    assert metadata == {"title": "Example"}
+    chunks = provider.store.get_chunks("default")
+    assert [chunk.metadata for chunk in chunks] == [
+        {"title": "Example", "chunk_index": 0, "total_chunks": 2},
+        {"title": "Example", "chunk_index": 1, "total_chunks": 2},
+    ]
+
+
+@pytest.mark.parametrize("shape", [(0, 4), (1, 3), (4,)])
+def test_invalid_embedding_does_not_change_collection(offline_provider, monkeypatch, shape):
+    provider = offline_provider
+    assert provider.ingest("first", "doc", chunking="fixed")["status"] == "ok"
+    before = provider.store.load_vectors("default").copy()
+    monkeypatch.setattr(provider.embedder, "embed", lambda texts: np.zeros(shape))
+    assert provider.ingest("second", "doc", chunking="fixed")["status"] == "error"
+    assert provider.store.count_chunks("default") == 1
+    np.testing.assert_array_equal(provider.store.load_vectors("default"), before)
 
 
 def test_rag_service_client():
@@ -204,43 +230,25 @@ def test_rag_service_client():
     assert client.base_url == "http://127.0.0.1:7864"
 
 
-def test_rag_provider_list_collections():
-    """Test listing collections."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        provider = RAGProvider({"data_dir": tmpdir})
-
-        provider.ingest("Text for col1", "s1.txt", "col1")
-        provider.ingest("Text for col2", "s2.txt", "col2")
-
-        collections = provider.list_collections()
-        assert len(collections) == 2
-        names = {c["collection"] for c in collections}
-        assert names == {"col1", "col2"}
+def test_rag_provider_list_collections(offline_provider):
+    offline_provider.ingest("Text for col1", "s1.txt", "col1")
+    offline_provider.ingest("Text for col2", "s2.txt", "col2")
+    assert {c["collection"] for c in offline_provider.list_collections()} == {"col1", "col2"}
 
 
-def test_rag_provider_delete_collection():
-    """Test deleting a collection."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        provider = RAGProvider({"data_dir": tmpdir})
-
-        provider.ingest("Text to delete", "s1.txt", "to_delete")
-        assert len(provider.list_collections()) == 1
-
-        provider.delete_collection("to_delete")
-        assert len(provider.list_collections()) == 0
+def test_rag_provider_delete_collection(offline_provider):
+    offline_provider.ingest("Text to delete", "s1.txt", "to_delete")
+    assert len(offline_provider.list_collections()) == 1
+    offline_provider.delete_collection("to_delete")
+    assert offline_provider.list_collections() == []
 
 
-def test_rag_provider_stats():
-    """Test collection statistics."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        provider = RAGProvider({"data_dir": tmpdir})
-
-        provider.ingest("Some text content here.", "source.txt", "stats_test")
-        stats = provider.get_collection_stats("stats_test")
-
-        assert stats["collection"] == "stats_test"
-        assert stats["chunk_count"] > 0
-        assert stats["has_vectors"] is True
+def test_rag_provider_stats(offline_provider):
+    offline_provider.ingest("Some text content here.", "source.txt", "stats_test")
+    stats = offline_provider.get_collection_stats("stats_test")
+    assert stats["collection"] == "stats_test"
+    assert stats["chunk_count"] == 1
+    assert stats["has_vectors"] is True
 
 
 if __name__ == "__main__":

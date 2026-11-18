@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Build the MCP Apps panel: the app under dist/panel, served at /panel/.
- * See build/panel.js.
+ * See build-tools/panel.js.
  */
 
 import { readFile, rename, rm, writeFile } from 'node:fs/promises';
@@ -16,7 +16,7 @@ import {
   PANEL_WORKER_PRELUDE_PATH,
   panelBuildConfig,
   workerFilesPrelude,
-} from '../build/panel.js';
+} from '../build-tools/panel.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const outDir = join(root, PANEL_OUT_DIR);

@@ -1,6 +1,6 @@
 import { ShareRestoration } from './ui/shareRestoration.js';
 import { readShellSource, shellMethod } from './testSupport/readShellSource.mjs';
-import { expandApplicationHtml } from '../build/application-html.js';
+import { expandApplicationHtml } from '../build-tools/application-html.js';
 import { readStylesheet } from './testSupport/readStylesheet.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';

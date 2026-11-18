@@ -1,9 +1,9 @@
 """Compiled CPU kernels and differentiable rasterization, not just imports."""
 import pytest
-import torch
 
 
 def test_native_kernels_and_render_gradients():
+    torch = pytest.importorskip('torch')
     pytest.importorskip('pytorch3d._C')
     from pytorch3d.ops import knn_points
     from pytorch3d.renderer.mesh.rasterize_meshes import rasterize_meshes

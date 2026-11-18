@@ -7,7 +7,7 @@
  */
 
 export const GLOBE_PANEL_URI = 'ui://gods-eye-view/globe';
-/** Where the app's server serves its panel build (see build/panel.js). */
+/** Where the app's server serves its panel build (see build-tools/panel.js). */
 export const PANEL_BASE = '/panel/';
 /** The script the panel runs ahead of Cesium's workers, in the build. */
 export const PANEL_WORKER_PRELUDE_PATH = 'cesium/worker-prelude.js';

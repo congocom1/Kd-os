@@ -1,10 +1,11 @@
 # MARK LVI — source-distribution manifest.
 # Secrets, personal data and dev artifacts never ship in an sdist.
 
-exclude config/api_keys.json
+exclude config/api_keys.*
 exclude .env
 exclude .env.*
-recursive-exclude config certs whatsapp_web
+prune config/certs
+prune config/whatsapp_web
 recursive-exclude memory *.db
 exclude memory/long_term.json
 

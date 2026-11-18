@@ -24,6 +24,7 @@ from typing import Any
 from fastapi import WebSocketDisconnect
 
 from core.paths import get_base_dir as _get_base_dir
+from dashboard.telemetry_feed import TelemetryFeed
 
 # Try to import telemetry; if the module isn't present on the target host,
 # provide a trivial fallback so the dashboard still starts.
@@ -860,6 +861,7 @@ class DashboardServer:
 
     def _build_app(self) -> "FastAPI":
         app = FastAPI(docs_url=None, redoc_url=None)
+        telemetry = TelemetryFeed(get_telemetry, interval=TELEMETRY_INTERVAL_S)
         app.mount('/static', StaticFiles(directory=str(STATIC_DIR)), name='static')
 
         def _valid(tok: str) -> bool:
@@ -1330,17 +1332,16 @@ class DashboardServer:
             """
             if not _auth(req):
                 return JSONResponse({"error": "Unauthorized"}, status_code=401)
-            data = await asyncio.to_thread(get_telemetry)
+            data = await telemetry.snapshot()
             # Recheck after collection: a slow probe must not extend a session.
             if not _auth(req):
                 return JSONResponse({"error": "Unauthorized"}, status_code=401)
-            return JSONResponse({**data, "cpu": data.get("system", {}).get("cpu_percent"),
-                                 "last_updated": time.time()},
+            return JSONResponse({**data, "cpu": data.get("system", {}).get("cpu_percent")},
                                 headers={"Cache-Control": "no-store"})
 
         @app.websocket("/ws/telemetry")
         async def telemetry_ws(websocket: WebSocket, token: str = ""):
-            """Per-connection stream; no global client set or locks across awaits."""
+            """Authenticated stream using the same sampling window as HTTP."""
             tok = token.strip()
             if not _origin_allowed(websocket) or not _valid(tok):
                 await websocket.close(code=4001)
@@ -1351,11 +1352,11 @@ class DashboardServer:
                     if not _valid(tok):
                         await websocket.close(code=4001)
                         return
-                    payload = await asyncio.to_thread(get_telemetry)
+                    payload = await telemetry.snapshot()
                     if not _valid(tok):
                         await websocket.close(code=4001)
                         return
-                    await websocket.send_json({**payload, "last_updated": time.time()})
+                    await websocket.send_json(payload)
                     # Observe disconnects promptly, and bound idle expiry checks.
                     try:
                         message = await asyncio.wait_for(websocket.receive(), TELEMETRY_INTERVAL_S)

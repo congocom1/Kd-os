@@ -46,7 +46,8 @@ pyperclip
 
 # ── Vision & media ────────────────────────────────────────────────────────────
 pillow>=10,<13
-opencv-python>=4.8,<5
+# The HUD handles display; OpenCV only captures and processes frames.
+opencv-python-headless>=4.8,<5
 mss>=9,<11
 
 # ── System, files & documents ─────────────────────────────────────────────────

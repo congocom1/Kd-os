@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createServer, preview } from 'vite';
-import { hostCheckPlugin, resolveAllowedHosts } from '../build/allowedHosts.js';
+import { hostCheckPlugin, resolveAllowedHosts } from '../build-tools/allowedHosts.js';
 import { standaloneVoiceTools } from '../server/standalone/voiceTools.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
